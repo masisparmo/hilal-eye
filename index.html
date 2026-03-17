@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hilal-Eye | Accurate Hilal Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+:root {
+    --bg-dark: #050b18;
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --accent-gold: #ffd700;
+    --accent-purple: #c084fc;
+    --text-light: #f8fafc;
+    --text-dim: #94a3b8;
+    --grad-primary: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    --success-green: #22c55e;
+    --danger-red: #ef4444;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-dark);
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-light);
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* Background Stars Effect */
+.stars, .twinkling {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%; height: 100%;
+    display: block;
+    z-index: -1;
+}
+
+.stars {
+    background: #000 url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/123163/stars.png) repeat top center;
+}
+
+.twinkling {
+    background: transparent url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/123163/twinkling.png) repeat top center;
+    animation: move-twink-back 200s linear infinite;
+}
+
+@keyframes move-twink-back {
+    from { background-position: 0 0; }
+    to { background-position: -10000px 5000px; }
+}
+
+.visual-container {
+    background: rgba(2, 11, 26, 0.6);
+    padding: 1.5rem;
+    border-radius: 15px;
+    margin-top: 1.5rem;
+    border: 1px solid var(--glass-border);
+    text-align: center;
+}
+
+.visual-container h3 {
+    margin-bottom: 1rem;
+    color: var(--accent-gold);
+}
+
+.fullscreen-chat {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+}
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 2;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    font-size: 3rem;
+    font-weight: 600;
+    background: linear-gradient(to right, var(--accent-gold), #fff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    color: var(--text-dim);
+    letter-spacing: 1px;
+}
+
+/* History Panel Styles */
+.history-panel {
+    margin-top: 1.5rem;
+    padding: 1rem !important;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.5rem;
+}
+
+.history-header h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--accent-gold);
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.history-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.history-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+.history-item .info {
+    display: flex;
+    flex-direction: column;
+}
+
+.history-item .name {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.history-item .date {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.empty-msg {
+    text-align: center;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.4);
+    padding: 1rem;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--accent-purple);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0;
+}
+
+.btn-text:hover { text-decoration: underline; }
+
+/* Tab Styles */
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.tab-btn {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-dim);
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: inherit;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tab-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+}
+
+.tab-btn.active {
+    background: var(--grad-primary);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 1.5rem;
+    align-items: flex-end;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.input-group label {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+}
+
+.input-group input {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 0.8rem;
+    color: white;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.input-group input:focus {
+    border-color: var(--accent-purple);
+}
+
+.date-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.date-wrapper input {
+    flex: 1;
+}
+
+.day-badge {
+    position: absolute;
+    right: 10px;
+    background: var(--accent-purple);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    pointer-events: none;
+}
+
+/* Custom Flatpickr Styling */
+.flatpickr-calendar {
+    background: rgba(15, 23, 42, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+    border-radius: 15px !important;
+}
+
+.flatpickr-day.selected {
+    background: var(--grad-primary) !important;
+    border-color: transparent !important;
+}
+
+.flatpickr-day:hover {
+    background: rgba(168, 85, 247, 0.2) !important;
+}
+
+.btn-primary {
+    background: var(--grad-primary);
+    color: white;
+    border: none;
+    padding: 0.9rem 2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid var(--glass-border);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.result-container, .recap-container {
+    margin-top: 2rem;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.result-card {
+    margin-bottom: 2rem;
+}
+
+.result-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 1rem;
+}
+
+.result-header h2 {
+    font-size: 2rem;
+    color: var(--accent-gold);
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+}
+
+.data-group h3 {
+    font-size: 1.1rem;
+    color: var(--accent-purple);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.data-group p {
+    margin-bottom: 0.5rem;
+    font-weight: 300;
+}
+
+.data-group span {
+    font-weight: 600;
+    color: white;
+}
+
+.status-box {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 15px;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: var(--glass-border);
+}
+
+.badge.success { background-color: var(--success-green); }
+.badge.danger { background-color: var(--danger-red); }
+
+.visual-container {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.visual-container img {
+    max-width: 100%;
+    border-radius: 15px;
+    margin-top: 1rem;
+    border: 1px solid var(--glass-border);
+}
+
+.toolbar {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.toolbar button {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+}
+
+.toolbar button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--accent-gold);
+}
+
+/* Recap Table Styles */
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 1rem;
+    padding: 0;
+}
+
+.criteria-notes {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    font-size: 0.9rem;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.criteria-notes h4 {
+    color: var(--accent-gold);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.note-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.note-item strong {
+    color: var(--accent-purple);
+}
+
+.note-item span {
+    color: var(--text-dim);
+    line-height: 1.4;
+}
+
+.recap-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.recap-table th {
+    text-align: left;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid var(--glass-border);
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.recap-table th:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.recap-table td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.recap-table tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.recap-toolbar {
+    justify-content: flex-end;
+}
+
+.hidden { display: none !important; }
+
+/* Chat System Styles */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+    margin-top: 1rem;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.message {
+    max-width: 80%;
+    padding: 1rem;
+    border-radius: 15px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.ai-message {
+    align-self: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-bottom-left-radius: 2px;
+}
+
+.user-message {
+    align-self: flex-end;
+    background: var(--grad-primary);
+    color: #fff;
+    border-bottom-right-radius: 2px;
+}
+
+.chat-input-area {
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+#chat-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: #fff;
+    padding: 0.8rem;
+    resize: none;
+    outline: none;
+}
+
+#send-chat-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-settings {
+    margin-bottom: 1rem;
+}
+
+/* Rich Text inside chat */
+.message table {
+    width: 100%;
+    margin: 1rem 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
+}
+
+.message th {
+    background: rgba(0, 0, 0, 0.4);
+    color: var(--accent-gold);
+    font-weight: 600;
+}
+
+.message th, .message td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: left;
+}
+
+.message tr:last-child td {
+    border-bottom: none;
+}
+
+.fullscreen-chat {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh !important;
+    z-index: 100;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    padding: 2rem !important;
+}
+
+
+/* Footer & Credits */
+/* Loader Styles */
+.loader {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.moon-loader {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--accent-gold);
+    box-shadow: inset 15px 0 0 rgba(0,0,0,0.1), 0 0 30px var(--accent-gold);
+    margin-bottom: 1.5rem;
+    animation: rotate 4s linear infinite, pulse 2s infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+}
+
+/* Print Specific Styles */
+@media print {
+    body { background: white; color: black; }
+    .stars, .twinkling, .input-section, .toolbar, header p, .tabs, .chat-settings, .chat-input-area, .chat-header button { display: none !important; }
+    .glass-card { border: none; box-shadow: none; background: transparent; padding: 0; }
+    header h1 { -webkit-text-fill-color: black; text-align: left; }
+    .result-grid { grid-template-columns: 1fr; }
+    .data-group span { color: black; }
+}
+
+@media (max-width: 768px) {
+    .input-grid {
+        grid-template-columns: 1fr;
+    }
+    .result-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+</style>
+    <!-- Load FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Flatpickr for premium Date Picker -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    
+    <main class="container">
+        <header>
+            <h1><i class="fas fa-moon"></i> Hilal-Eye</h1>
+            <p>Sistem Pemantauan Hilal Astronomis Terakurat</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" onclick="switchTab('calculator', this)"><i class="fas fa-calculator"></i> Kalkulator Kota</button>
+            <button class="tab-btn" onclick="switchTab('recap', this)"><i class="fas fa-globe-asia"></i> Rekap Nasional</button>
+            <button class="tab-btn" onclick="switchTab('ai', this)"><i class="fas fa-robot"></i> Konsultan AI</button>
+        </nav>
+
+        <section id="tab-calculator" class="tab-content active">
+            <section class="glass-card input-section">
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="city-input"><i class="fas fa-search-location"></i> Cari Kabupaten/Kota</label>
+                        <input type="text" id="city-input" list="city-list" placeholder="Ketik nama kota...">
+                        <datalist id="city-list">
+                            <!-- City options will be loaded dynamically by JS -->
+                        </datalist>
+                    </div>
+                    <div class="input-group">
+                        <label for="obs-date"><i class="fas fa-calendar-alt"></i> Tanggal Pengamatan</label>
+                        <div class="date-wrapper">
+                            <input type="date" id="obs-date" value="2026-03-19">
+                            <span id="obs-day-name" class="day-badge">Kamis</span>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <button id="calculate-btn" class="btn-primary">Hitung Posisi Hilal</button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="criteria-notes glass-card" style="margin-top: 2rem;">
+                <h4><i class="fas fa-info-circle"></i> Keterangan Kriteria Visibilitas</h4>
+                <div class="notes-grid">
+                    <div class="note-item">
+                        <strong>MABIMS (Baru):</strong>
+                        <span>Tinggi Hilal min. 3‚° DAN Elongasi min. 6.4‚°. Keduanya harus terpenuhi.</span>
+                    </div>
+                    <div class="note-item">
+                        <strong>Danjon Limit:</strong>
+                        <span>Hilal dianggap mustahil terlihat jika elongasi di bawah 7‚° (Limit fisik pantulan cahaya).</span>
+                    </div>
+                    <div class="note-item">
+                        <strong>Kriteria Odeh:</strong>
+                        <span>Berdasarkan ketebalan sabit dan kontras cahaya. A=Mudah, B=Mungkin, C/D=Butuh Optik, Invisible=Tidak Mungkin.</span>
+                    </div>
+                </div>
+            </div>
+
+            <section id="result-section" class="result-container hidden">
+                <div class="glass-card result-card" id="printable-result">
+                    <div class="result-header">
+                        <h2 id="res-location">Jakarta</h2>
+                        <p id="res-date">19 March 2026</p>
+                    </div>
+                    
+                    <div class="result-grid">
+                        <div class="data-group">
+                            <h3><i class="fas fa-sun"></i> Data Matahari</h3>
+                            <p>Sunset: <span id="val-sunset"></span></p>
+                            <p>Azimuth: <span id="val-sun-az"></span>‚°</p>
+                            <p>Altitude: <span id="val-sun-alt"></span>‚°</p>
+                        </div>
+                        <div class="data-group">
+                            <h3><i class="fas fa-moon"></i> Data Bulan</h3>
+                            <p>Moonset: <span id="val-moonset"></span></p>
+                            <p>Azimuth: <span id="val-moon-az"></span>‚°</p>
+                            <p>Altitude: <span id="val-moon-alt"></span>‚°</p>
+                        </div>
+                        <div class="data-group">
+                            <h3><i class="fas fa-sliders-h"></i> Parameter Hilal</h3>
+                            <p>Elongasi: <span id="val-elongation"></span>‚°</p>
+                            <p>Umur Bulan: <span id="val-age"></span> jam</p>
+                            <p>Lag Time: <span id="val-lag"></span> menit</p>
+                        </div>
+                        <div class="data-group status-box">
+                            <h3><i class="fas fa-eye"></i> Status Visibilitas</h3>
+                            <div class="status-item">
+                                <label>MABIMS:</label>
+                                <span id="stat-mabims" class="badge"></span>
+                            </div>
+                            <div class="status-item">
+                                <label>Odeh:</label>
+                                <span id="stat-odeh" class="badge"></span>
+                            </div>
+                            <div class="status-item">
+                                <label>Danjon:</label>
+                                <span id="stat-danjon" class="badge"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="visual-container">
+                        <h3>Visualisasi Posisi</h3>
+                        <img id="hilal-plot" src="" alt="Plot Hilal">
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <button onclick="copyToClipboard()" title="Copy Text"><i class="fas fa-copy"></i> Copy</button>
+                    <button onclick="downloadAs('txt')" title="Simpan sebagai TXT"><i class="fas fa-file-alt"></i> .txt</button>
+                    <button onclick="downloadAs('md')" title="Simpan sebagai MD"><i class="fas fa-file-code"></i> .md</button>
+                    <button onclick="downloadAs('csv')" title="Simpan sebagai CSV"><i class="fas fa-file-csv"></i> .csv</button>
+                    <button onclick="downloadAs('xlsx')" title="Simpan sebagai XLSX"><i class="fas fa-file-excel"></i> .xlsx</button>
+                    <button onclick="printResult()" title="Print"><i class="fas fa-print"></i> PRINT</button>
+                </div>
+                </div>
+                
+                <!-- History Panel for Calculator -->
+                <div class="history-panel glass-card" id="history-single" style="margin-top: 2rem;">
+                    <div class="history-header">
+                        <h4><i class="fas fa-history"></i> Riwayat Perhitungan</h4>
+                        <button class="btn-text" onclick="clearHistory('single')">Hapus Semua</button>
+                    </div>
+                    <div class="history-list" id="history-list-single">
+                        <p class="empty-msg">Belum ada riwayat.</p>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <section id="tab-recap" class="tab-content">
+            <section class="glass-card input-section">
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="recap-date"><i class="fas fa-calendar-alt"></i> Tanggal Pengamatan</label>
+                        <div class="date-wrapper">
+                            <input type="date" id="recap-date" value="2026-03-19">
+                            <span id="recap-day-name" class="day-badge">Kamis</span>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <button id="recap-btn" class="btn-primary">Lihat Rekap Nasional</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="recap-result" class="recap-container hidden">
+                <div class="criteria-notes glass-card" style="margin-bottom: 2rem;">
+                    <h4><i class="fas fa-info-circle"></i> Keterangan Kriteria Visibilitas</h4>
+                    <div class="notes-grid">
+                        <div class="note-item">
+                            <strong>MABIMS (Baru):</strong>
+                            <span>Tinggi Hilal min. 3‚° DAN Elongasi min. 6.4‚°. Keduanya harus terpenuhi.</span>
+                        </div>
+                        <div class="note-item">
+                            <strong>Danjon Limit:</strong>
+                            <span>Hilal dianggap mustahil terlihat jika elongasi di bawah 7‚° (Limit fisik pantulan cahaya).</span>
+                        </div>
+                        <div class="note-item">
+                            <strong>Kriteria Odeh:</strong>
+                            <span>Berdasarkan ketebalan sabit dan kontras cahaya. A=Mudah, B=Mungkin, C/D=Butuh Optik, Invisible=Tidak Mungkin.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="toolbar recap-toolbar">
+                    <button id="export-recap-csv" class="btn-secondary"><i class="fas fa-file-csv"></i> Ekspor CSV</button>
+                    <button id="export-recap-xlsx" class="btn-secondary"><i class="fas fa-file-excel"></i> Ekspor Excel</button>
+                </div>
+                <div class="glass-card table-wrapper">
+                    <table class="recap-table" id="recap-table">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable(0)">Lokasi <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(1)">Sunset <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(2)">Altitude <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(3)">Elongasi <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(4)">MABIMS <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(5)">Odeh <i class="fas fa-sort"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody id="recap-body">
+                            <!-- Data will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+                
+                <!-- History Panel for Recap -->
+                <div class="history-panel glass-card" id="history-recap" style="margin-top: 2rem;">
+                    <div class="history-header">
+                        <h4><i class="fas fa-history"></i> Riwayat Rekap</h4>
+                        <button class="btn-text" onclick="clearHistory('recap')">Hapus Semua</button>
+                    </div>
+                    <div class="history-list" id="history-list-recap">
+                        <p class="empty-msg">Belum ada riwayat rekap.</p>
+                    </div>
+                </div>
+
+            </section>
+        </section>
+
+        <section id="tab-ai" class="tab-content">
+            <section class="glass-card chat-container" id="chat-wrapper">
+                <div class="chat-header" style="margin-bottom: 1.5rem; text-align: center; position: relative;">
+                    <h3><i class="fas fa-robot"></i> Konsultan Astronomi AI</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-dim);">Diskusikan data hilal Anda dengan AI.</p>
+                    <button id="toggle-fullscreen-btn" class="btn-secondary" style="position: absolute; right: 0; top: 0;" title="Full Screen" onclick="toggleChatFullscreen()"><i class="fas fa-expand"></i></button>
+                </div>
+
+                <div class="chat-settings" style="padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 10px; margin-bottom: 1.5rem;">
+                    <label style="font-size: 0.8rem; color: var(--accent-gold);">API Key Gemini:</label>
+                    <input type="password" id="gemini-key" placeholder="Masukkan API Key..." style="width: 100%; margin-top: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 0.5rem; color: white; border-radius: 5px;">
+                    <small style="display: block; margin-top: 0.3rem;"><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--accent-purple);">Ambil Key Baru Disini</a></small>
+                </div>
+
+                <div class="chat-messages" id="chat-messages" style="flex: 1;">
+                    <div class="message ai-message">
+                        Halo! Saya adalah Konsultan HI-Eye. Beritahu saya Nama Kota dan Tanggal, lalu tanya apa saja terkait hilal.
+                    </div>
+                </div>
+
+                <div class="chat-input-area">
+                    <textarea id="chat-input" placeholder="Tulis pertanyaan... (Enter untuk kirim)"></textarea>
+                    <button id="send-chat-btn" class="btn-primary"><i class="fas fa-paper-plane"></i></button>
+                </div>
+                
+                <div class="toolbar chat-toolbar" style="margin-top: 1rem; gap: 0.5rem;">
+                    <button onclick="copyChat()" title="Copy Text"><i class="fas fa-copy"></i> Copy</button>
+                    <button onclick="downloadChat('txt')" title="Simpan sebagai TXT"><i class="fas fa-file-alt"></i> .txt</button>
+                    <button onclick="downloadChat('md')" title="Simpan sebagai MD"><i class="fas fa-file-code"></i> .md</button>
+                    <button onclick="downloadChat('docx')" title="Simpan sebagai DOCX"><i class="fas fa-file-word"></i> .docx</button>
+                    <button onclick="printChat()" title="Print Chat"><i class="fas fa-print"></i> PRINT</button>
+                </div>
+            </section>
+        </section>
+
+        <div id="loader" class="loader hidden">
+            <div class="moon-loader"></div>
+            <p id="loader-text">Menghitung parameter astronomis...</p>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+const CITIES = [{"name": "Kabupaten Simeulue", "lat": 2.61667, "lon": 96.08333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Aceh Singkil", "lat": 2.41667, "lon": 97.91667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Aceh Selatan", "lat": 3.16667, "lon": 97.41667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Aceh Tenggara", "lat": 3.36667, "lon": 97.7, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Aceh Timur", "lat": 4.63333, "lon": 97.63333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Aceh Tengah", "lat": 4.51, "lon": 96.855, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Aceh Barat", "lat": 4.45, "lon": 96.16667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Aceh Besar", "lat": 5.38333, "lon": 95.51667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pidie", "lat": 5.08, "lon": 96.11, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bireuen", "lat": 5.08333, "lon": 96.58333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Aceh Utara", "lat": 4.97, "lon": 97.14, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Aceh Barat Daya", "lat": 3.83333, "lon": 96.88333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Gayo Lues", "lat": 3.95, "lon": 97.39, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Aceh Tamiang", "lat": 4.25, "lon": 97.96667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Nagan Raya", "lat": 4.16667, "lon": 96.51667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Aceh Jaya", "lat": 4.86, "lon": 95.64, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bener Meriah", "lat": 4.73015, "lon": 96.86156, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pidie Jaya", "lat": 5.15, "lon": 96.21667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Banda Aceh", "lat": 5.54167, "lon": 95.33333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Sabang", "lat": 5.82164, "lon": 95.31086, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Langsa", "lat": 4.47, "lon": 97.93, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Lhokseumawe", "lat": 5.13333, "lon": 97.06667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Subulussalam", "lat": 2.75, "lon": 97.93333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Nias", "lat": 1.03333, "lon": 97.76667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Mandailing Natal", "lat": 0.78378, "lon": 99.25495, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Tapanuli Selatan", "lat": 1.51667, "lon": 99.25, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Tapanuli Tengah", "lat": 1.9, "lon": 98.66667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Tapanuli Utara", "lat": 2.0028, "lon": 99.0707, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Toba Samosir", "lat": 2.39793, "lon": 99.21678, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Labuhan Batu", "lat": 2.26667, "lon": 100.1, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Asahan", "lat": 2.78333, "lon": 99.55, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Simalungun", "lat": 2.9, "lon": 99, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Dairi", "lat": 2.86667, "lon": 98.23333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Karo", "lat": 3.11667, "lon": 98.3, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Deli Serdang", "lat": 3.41667, "lon": 98.66667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Langkat", "lat": 3.71667, "lon": 98.21667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Nias Selatan", "lat": 0.77, "lon": 97.75, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Humbang Hasundutan", "lat": 2.26551, "lon": 98.50376, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pakpak Bharat", "lat": 2.56667, "lon": 98.28333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Samosir", "lat": 2.64025, "lon": 98.71525, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Serdang Bedagai", "lat": 3.36667, "lon": 99.03333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Batu Bara", "lat": 3.16166, "lon": 99.52652, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Padang Lawas Utara", "lat": 1.46011, "lon": 99.67346, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Padang Lawas", "lat": 1.44684, "lon": 99.99207, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Labuhan Batu Selatan", "lat": 1.983, "lon": 100.0976, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Labuhan Batu Utara", "lat": 2.33349, "lon": 99.63776, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Nias Utara", "lat": 1.33037, "lon": 97.31964, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Nias Barat", "lat": 1.05966, "lon": 97.58606, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Sibolga", "lat": 1.73333, "lon": 98.8, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Tanjung Balai", "lat": 2.95833, "lon": 99.79167, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Pematang Siantar", "lat": 2.96667, "lon": 99.05, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Tebing Tinggi", "lat": 3.325, "lon": 99.14167, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Medan", "lat": 3.65, "lon": 98.66667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Binjai", "lat": 3.8, "lon": 108.23333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Padang Sidempuan", "lat": 1.37375, "lon": 99.26843, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Gunungsitoli", "lat": 1.32731, "lon": 97.55018, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kepulauan Mentawai", "lat": 1.98917, "lon": 99.51889, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pesisir Selatan", "lat": -1.58333, "lon": 100.85, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Solok", "lat": -0.96667, "lon": 100.81667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Sijunjung", "lat": -1.1827, "lon": 101.6056, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Tanah Datar", "lat": -0.4555, "lon": 100.5771, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Padang Pariaman", "lat": -0.6, "lon": 100.28333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Agam", "lat": -0.25, "lon": 100.16667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Lima Puluh Kota", "lat": -0.0168, "lon": 100.5872, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pasaman", "lat": 0.42503, "lon": 99.94606, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Solok Selatan", "lat": -1.23333, "lon": 101.417, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Dharmasraya", "lat": -1.05, "lon": 101.367, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pasaman Barat", "lat": 0.28152, "lon": 99.51965, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Padang", "lat": -0.98333, "lon": 100.45, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Solok", "lat": -0.76667, "lon": 100.61667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Sawah Lunto", "lat": -0.6, "lon": 100.75, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Padang Panjang", "lat": -0.45, "lon": 100.43333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Bukittinggi", "lat": -0.275, "lon": 100.375, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Payakumbuh", "lat": -0.23333, "lon": 100.63333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Pariaman", "lat": -0.62682, "lon": 100.12047, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kuantan Singingi", "lat": -0.47532, "lon": 101.45857, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Indragiri Hulu", "lat": -0.55, "lon": 102.31667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Indragiri Hilir", "lat": -0.33333, "lon": 103.16667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pelalawan", "lat": 0.20822, "lon": 102.18607, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Siak", "lat": 0.97453, "lon": 102.01355, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kampar", "lat": 0.2344, "lon": 101.2131, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Rokan Hulu", "lat": 0.88333, "lon": 100.48333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bengkalis", "lat": 0.9838, "lon": 102.5096, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Rokan Hilir", "lat": 2.16599, "lon": 100.82514, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kepulauan Meranti", "lat": 0.97488, "lon": 102.69539, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Pekanbaru", "lat": 0.53333, "lon": 101.46667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Dumai", "lat": 1.61592, "lon": 101.4917, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kerinci", "lat": -2.03333, "lon": 101.53333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Merangin", "lat": -2.06933, "lon": 102.13303, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Sarolangun", "lat": -2.3, "lon": 102.65, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Batang Hari", "lat": -1.75, "lon": 103.11667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Muaro Jambi", "lat": -1.55214, "lon": 103.82163, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Tanjung Jabung Timur", "lat": -1.13198, "lon": 103.61755, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Tanjung Jabung Barat", "lat": -1.1544, "lon": 103.24402, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Tebo", "lat": -1.45576, "lon": 102.37473, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bungo", "lat": -1.50222, "lon": 101.96, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Jambi", "lat": -1.61667, "lon": 103.65, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Sungai Penuh", "lat": -2.10896, "lon": 101.32175, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Ogan Komering Ulu", "lat": -4.13333, "lon": 104.03333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Ogan Komering Ilir", "lat": -3.36667, "lon": 105.36667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Muara Enim", "lat": -4.2327, "lon": 103.6141, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Lahat", "lat": -3.7864, "lon": 103.5428, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Musi Rawas", "lat": -3.08333, "lon": 103.2, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Musi Banyu Asin", "lat": -2.41667, "lon": 103.75, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Banyu Asin", "lat": -2.88333, "lon": 104.38306, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Ogan Komering Ulu Selatan", "lat": -4.65728, "lon": 104.00659, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Ogan Komering Ulu Timur", "lat": -3.85679, "lon": 104.75209, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Ogan Ilir", "lat": -3.43186, "lon": 104.62727, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Empat Lawang", "lat": 3.22667, "lon": 99.09256, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Penukal Abab Lematang Ilir", "lat": -3.21342, "lon": 104.08722, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Musi Rawas Utara", "lat": -2.48533, "lon": 103.29346, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Palembang", "lat": -3, "lon": 104.71667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Prabumulih", "lat": -3.46202, "lon": 104.2229, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Pagar Alam", "lat": -4.13055, "lon": 103.26822, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Lubuk Linggau", "lat": -3.29308, "lon": 102.85503, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bengkulu Selatan", "lat": -4.35, "lon": 103.03333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Rejang Lebong", "lat": -3.43333, "lon": 102.71667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bengkulu Utara", "lat": -3.33333, "lon": 102.05, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kaur", "lat": -4.78179, "lon": 103.36109, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Seluma", "lat": -3.96644, "lon": 102.47429, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Mukomuko", "lat": -3.07438, "lon": 101.54766, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Lebong", "lat": -3.24278, "lon": 102.3349, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kepahiang", "lat": -3.60194, "lon": 102.56424, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bengkulu Tengah", "lat": -3.20679, "lon": 102.12616, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Bengkulu", "lat": -3.81667, "lon": 102.31667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Lampung Barat", "lat": -5.14904, "lon": 104.19309, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Tanggamus", "lat": -5.38508, "lon": 104.62349, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Lampung Selatan", "lat": -5.4531, "lon": 104.9877, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Lampung Timur", "lat": -5.10273, "lon": 105.68003, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Lampung Tengah", "lat": -4.86667, "lon": 105.26667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Lampung Utara", "lat": -4.81667, "lon": 104.8, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Way Kanan", "lat": -4.44705, "lon": 104.52753, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Tulangbawang", "lat": -4.20604, "lon": 105.57999, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pesawaran", "lat": -5.4298, "lon": 105.17899, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pringsewu", "lat": -5.42211, "lon": 104.93454, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Mesuji", "lat": -4.0439, "lon": 105.4013, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Tulang Bawang Barat", "lat": -4.43975, "lon": 105.0444, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pesisir Barat", "lat": -5.19323, "lon": 103.93976, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Bandar Lampung", "lat": -5.41667, "lon": 105.25, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Metro", "lat": -5.11856, "lon": 105.29949, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bangka", "lat": -1.91667, "lon": 105.93333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Belitung", "lat": -2.86667, "lon": 107.7, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bangka Barat", "lat": -1.95839, "lon": 105.53741, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bangka Tengah", "lat": -2.33989, "lon": 106.1142, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bangka Selatan", "lat": -2.66803, "lon": 106.01257, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Belitung Timur", "lat": -2.9627, "lon": 108.15216, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Pangkal Pinang", "lat": -2.13333, "lon": 106.13333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Karimun", "lat": 0.80764, "lon": 103.41911, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bintan", "lat": 0.95, "lon": 104.61944, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Natuna", "lat": 4.71417, "lon": 107.97639, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Lingga", "lat": 0.2, "lon": 104.61667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kepulauan Anambas", "lat": 3, "lon": 106, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Batam", "lat": 1.05211, "lon": 104.02851, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Tanjung Pinang", "lat": 0.91683, "lon": 104.44329, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kepulauan Seribu", "lat": -5.5985, "lon": 106.55271, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Jakarta Selatan", "lat": -6.266, "lon": 106.8135, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Jakarta Timur", "lat": -6.2521, "lon": 106.884, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Jakarta Pusat", "lat": -6.1777, "lon": 106.8403, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Jakarta Barat", "lat": -6.1676, "lon": 106.7673, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Jakarta Utara", "lat": -6.1339, "lon": 106.8823, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bogor", "lat": -6.58333, "lon": 106.71667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Sukabumi", "lat": -7.06667, "lon": 106.7, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Cianjur", "lat": -6.7725, "lon": 107.08306, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bandung", "lat": -7.1, "lon": 107.6, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Garut", "lat": -7.38333, "lon": 107.76667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Tasikmalaya", "lat": -7.5, "lon": 108.13333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Ciamis", "lat": -7.28333, "lon": 108.41667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kuningan", "lat": -7, "lon": 108.55, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Cirebon", "lat": -6.8, "lon": 108.56667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Majalengka", "lat": -6.81667, "lon": 108.28333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Sumedang", "lat": -6.81667, "lon": 107.98333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Indramayu", "lat": -6.45, "lon": 108.16667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Subang", "lat": -6.50833, "lon": 107.7025, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Purwakarta", "lat": -6.58333, "lon": 107.45, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Karawang", "lat": -6.26667, "lon": 107.41667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bekasi", "lat": -6.24667, "lon": 107.10833, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bandung Barat", "lat": -6.83333, "lon": 107.48333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pangandaran", "lat": -7.6673, "lon": 108.64037, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Bogor", "lat": -6.59167, "lon": 106.8, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Sukabumi", "lat": -6.95, "lon": 106.93333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Bandung", "lat": -6.9175, "lon": 107.62444, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Cirebon", "lat": -6.75, "lon": 108.55, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Bekasi", "lat": -6.28333, "lon": 106.98333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Depok", "lat": -6.4, "lon": 106.81667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Cimahi", "lat": -6.89167, "lon": 107.55, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Tasikmalaya", "lat": -7.35, "lon": 108.21667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Banjar", "lat": -7.36996, "lon": 108.53209, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Cilacap", "lat": -7.57417, "lon": 108.98861, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Banyumas", "lat": -7.45, "lon": 109.16667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Purbalingga", "lat": -7.28417, "lon": 109.35028, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Banjarnegara", "lat": -7.35111, "lon": 109.5875, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kebumen", "lat": -7.63917, "lon": 109.66056, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Purworejo", "lat": -7.7, "lon": 109.96667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Wonosobo", "lat": -7.36139, "lon": 109.92667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Magelang", "lat": -7.4275, "lon": 110.16194, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Boyolali", "lat": -7.5, "lon": 110.7, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Klaten", "lat": -7.68333, "lon": 110.61667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Sukoharjo", "lat": -7.68333, "lon": 110.83333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Wonogiri", "lat": -7.91667, "lon": 111, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Karanganyar", "lat": -7.62806, "lon": 111.0625, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Sragen", "lat": -7.41278, "lon": 110.935, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Grobogan", "lat": -7.11667, "lon": 110.91667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Blora", "lat": -7.06667, "lon": 111.38333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Rembang", "lat": -6.78333, "lon": 111.46667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pati", "lat": -6.76667, "lon": 111.1, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kudus", "lat": -6.8, "lon": 110.86667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Jepara", "lat": -6.58333, "lon": 110.76667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Demak", "lat": -6.8993, "lon": 110.6122, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Semarang", "lat": -7.20667, "lon": 110.44139, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Temanggung", "lat": -7.25, "lon": 110.11667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kendal", "lat": -7.0256, "lon": 110.1685, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Batang", "lat": -7.03333, "lon": 109.88333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pekalongan", "lat": -7.0319, "lon": 109.624, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pemalang", "lat": -7.03333, "lon": 109.4, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Tegal", "lat": -7.03333, "lon": 109.16667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Brebes", "lat": -7.05, "lon": 108.9, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Magelang", "lat": -7.5, "lon": 110.225, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Surakarta", "lat": -7.55, "lon": 110.81667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Salatiga", "lat": -7.33278, "lon": 110.48333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Semarang", "lat": -7.03333, "lon": 110.38333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Pekalongan", "lat": -6.9, "lon": 109.68333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Tegal", "lat": -6.8686, "lon": 109.1129, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kulon Progo", "lat": -7.645, "lon": 110.02694, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bantul", "lat": -7.9, "lon": 110.36667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Gunung Kidul", "lat": -7.98333, "lon": 110.61667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Sleman", "lat": -7.68167, "lon": 110.32333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Yogyakarta", "lat": -7.8, "lon": 110.375, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pacitan", "lat": -8.13333, "lon": 111.16667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Ponorogo", "lat": -7.93333, "lon": 111.5, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Trenggalek", "lat": -8.16667, "lon": 111.61667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Tulungagung", "lat": -8.11667, "lon": 111.91667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Blitar", "lat": -8.13333, "lon": 112.25, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kediri", "lat": -7.83333, "lon": 112.16667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Malang", "lat": -8.16667, "lon": 112.66667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Lumajang", "lat": -8.11667, "lon": 113.15, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Jember", "lat": -8.25, "lon": 113.65, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Banyuwangi", "lat": -8.33333, "lon": 114.2, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bondowoso", "lat": -7.9404, "lon": 113.9834, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Situbondo", "lat": -7.71667, "lon": 114.05, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Probolinggo", "lat": -7.86667, "lon": 113.31667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pasuruan", "lat": -7.73333, "lon": 112.83333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Sidoarjo", "lat": -7.45, "lon": 112.7, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Mojokerto", "lat": -7.55, "lon": 112.5, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Jombang", "lat": -7.55, "lon": 112.25, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Nganjuk", "lat": -7.6, "lon": 111.93333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Madiun", "lat": -7.61667, "lon": 111.65, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Magetan", "lat": -7.64472, "lon": 111.35917, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Ngawi", "lat": -7.47444, "lon": 111.33444, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bojonegoro", "lat": -7.25, "lon": 111.8, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Tuban", "lat": -6.96667, "lon": 111.9, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Lamongan", "lat": -7.13333, "lon": 112.31667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Gresik", "lat": -7.1933, "lon": 112.553, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Bangkalan", "lat": -7.05, "lon": 112.93333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Sampang", "lat": -7.05, "lon": 113.25, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pamekasan", "lat": -7.06667, "lon": 113.5, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Sumenep", "lat": -7.11667, "lon": 114.33333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Kediri", "lat": -7.83333, "lon": 112.01667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Blitar", "lat": -8.1, "lon": 112.16667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Malang", "lat": -7.975, "lon": 112.63333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Probolinggo", "lat": -7.78333, "lon": 113.21667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Pasuruan", "lat": -7.65, "lon": 112.9, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Mojokerto", "lat": -7.46667, "lon": 112.43333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Madiun", "lat": -7.63333, "lon": 111.53333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Surabaya", "lat": -7.26667, "lon": 112.71667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Batu", "lat": -7.83272, "lon": 112.53751, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pandeglang", "lat": -6.63333, "lon": 105.75, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Lebak", "lat": -6.65, "lon": 106.21667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Tangerang", "lat": -6.2, "lon": 106.46667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Serang", "lat": -6.15, "lon": 106, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Tangerang", "lat": -6.17944, "lon": 106.62991, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Cilegon", "lat": -6.01667, "lon": 106.01667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Serang", "lat": -6.12563, "lon": 106.14999, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Tangerang Selatan", "lat": -6.29373, "lon": 106.71244, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Jembrana", "lat": -8.3, "lon": 114.66667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Tabanan", "lat": -8.43333, "lon": 115.06667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Badung", "lat": -8.51667, "lon": 115.2, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Gianyar", "lat": -8.46667, "lon": 115.28333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Klungkung", "lat": -8.55, "lon": 115.4, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Bangli", "lat": -8.28333, "lon": 115.35, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Karang Asem", "lat": -8.3891, "lon": 115.5393, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Buleleng", "lat": -8.25, "lon": 114.96667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Denpasar", "lat": -8.66667, "lon": 115.21663, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Lombok Barat", "lat": -8.69583, "lon": 116.11667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Lombok Tengah", "lat": -8.7, "lon": 116.3, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Lombok Timur", "lat": -8.53333, "lon": 116.53333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Sumbawa", "lat": -8.7439, "lon": 117.3324, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Dompu", "lat": -8.5094, "lon": 118.4816, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Bima", "lat": -8.6, "lon": 118.61667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Sumbawa Barat", "lat": -8.75159, "lon": 116.92132, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Lombok Utara", "lat": -8.35214, "lon": 116.40152, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Mataram", "lat": -8.5833, "lon": 116.1167, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Bima", "lat": -8.46728, "lon": 118.75259, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Sumba Barat", "lat": -9.56667, "lon": 119.45, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Sumba Timur", "lat": -9.88333, "lon": 120.25, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Kupang", "lat": -9.91667, "lon": 123.83333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Timor Tengah Selatan", "lat": -9.83333, "lon": 124.4, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Timor Tengah Utara", "lat": -9.33136, "lon": 124.51904, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Belu", "lat": -9.41258, "lon": 124.95066, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Alor", "lat": -8.3, "lon": 124.56667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Lembata", "lat": -8.41396, "lon": 123.55225, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Flores Timur", "lat": -8.24224, "lon": 122.96817, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Sikka", "lat": -8.66667, "lon": 122.36667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Ende", "lat": -8.84056, "lon": 121.66389, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Ngada", "lat": -8.66667, "lon": 121, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Manggarai", "lat": -8.56667, "lon": 120.41667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Rote Ndao", "lat": -10.73617, "lon": 123.12054, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Manggarai Barat", "lat": -8.64484, "lon": 119.88281, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Sumba Tengah", "lat": -9.62941, "lon": 119.61914, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Sumba Barat Daya", "lat": -9.56216, "lon": 119.08905, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Nagekeo", "lat": -8.8721, "lon": 121.20963, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Manggarai Timur", "lat": -8.55533, "lon": 120.59761, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Sabu Raijua", "lat": -10.56286, "lon": 121.78894, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Malaka", "lat": -9.5632, "lon": 124.89481, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Kupang", "lat": -10.21667, "lon": 123.6, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Sambas", "lat": 1.41667, "lon": 109.33333, "elevation": 10, "tz": "Asia/Pontianak"}, {"name": "Kabupaten Bengkayang", "lat": 1.06911, "lon": 109.66393, "elevation": 10, "tz": "Asia/Pontianak"}, {"name": "Kabupaten Landak", "lat": 0.42373, "lon": 109.75917, "elevation": 10, "tz": "Asia/Pontianak"}, {"name": "Kabupaten Mempawah", "lat": 0.25, "lon": 109.16667, "elevation": 10, "tz": "Asia/Pontianak"}, {"name": "Kabupaten Sanggau", "lat": 0.25472, "lon": 110.45, "elevation": 10, "tz": "Asia/Pontianak"}, {"name": "Kabupaten Ketapang", "lat": -1.58333, "lon": 110.5, "elevation": 10, "tz": "Asia/Pontianak"}, {"name": "Kabupaten Sintang", "lat": -0.08333, "lon": 112.08333, "elevation": 10, "tz": "Asia/Pontianak"}, {"name": "Kabupaten Kapuas Hulu", "lat": 0.81667, "lon": 112.76667, "elevation": 10, "tz": "Asia/Pontianak"}, {"name": "Kabupaten Sekadau", "lat": 0.03485, "lon": 110.95066, "elevation": 10, "tz": "Asia/Pontianak"}, {"name": "Kabupaten Melawi", "lat": -0.33617, "lon": 111.698, "elevation": 10, "tz": "Asia/Pontianak"}, {"name": "Kabupaten Kayong Utara", "lat": -1.43711, "lon": 110.79781, "elevation": 10, "tz": "Asia/Pontianak"}, {"name": "Kabupaten Kubu Raya", "lat": 0.01637, "lon": 109.33731, "elevation": 10, "tz": "Asia/Pontianak"}, {"name": "Kota Pontianak", "lat": -0.08333, "lon": 109.36667, "elevation": 10, "tz": "Asia/Pontianak"}, {"name": "Kota Singkawang", "lat": 0.90734, "lon": 109.00103, "elevation": 10, "tz": "Asia/Pontianak"}, {"name": "Kabupaten Kotawaringin Barat", "lat": -2.4, "lon": 111.73333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kotawaringin Timur", "lat": -2.08333, "lon": 112.75, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Kapuas", "lat": -2.01667, "lon": 114.38333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Barito Selatan", "lat": -1.86667, "lon": 114.73333, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Barito Utara", "lat": -0.98333, "lon": 115.1, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Sukamara", "lat": -2.62675, "lon": 111.23681, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Lamandau", "lat": -1.83828, "lon": 111.2869, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Seruyan", "lat": -2.33333, "lon": 112.25, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Katingan", "lat": -2.06667, "lon": 113.4, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Pulang Pisau", "lat": -3.11858, "lon": 113.8623, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Gunung Mas", "lat": -0.95, "lon": 113.5, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Barito Timur", "lat": -1.93333, "lon": 115.1, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Murung Raya", "lat": -0.01667, "lon": 114.26667, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kota Palangka Raya", "lat": -1.76979, "lon": 113.73126, "elevation": 10, "tz": "Asia/Jakarta"}, {"name": "Kabupaten Tanah Laut", "lat": -3.88333, "lon": 114.86667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Kota Baru", "lat": -3, "lon": 116, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Banjar", "lat": -3.31667, "lon": 115.08333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Barito Kuala", "lat": -3.08333, "lon": 114.61667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Tapin", "lat": -2.91667, "lon": 115.03333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Hulu Sungai Selatan", "lat": -2.75, "lon": 115.2, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Hulu Sungai Tengah", "lat": -2.61667, "lon": 115.41667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Hulu Sungai Utara", "lat": -2.45, "lon": 115.13333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Tabalong", "lat": -1.88333, "lon": 115.5, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Tanah Bumbu", "lat": -3.45413, "lon": 115.70372, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Balangan", "lat": -2.32314, "lon": 115.62922, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Banjarmasin", "lat": -3.32444, "lon": 114.59102, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Banjar Baru", "lat": -3.41667, "lon": 114.83333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Paser", "lat": -1.43517, "lon": 116.23535, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Kutai Barat", "lat": -0.59417, "lon": 115.51575, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Kutai Kartanegara", "lat": -0.44019, "lon": 116.98139, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Kutai Timur", "lat": 1.03769, "lon": 117.83112, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Berau", "lat": 2, "lon": 117.3, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Penajam Paser Utara", "lat": -1.25, "lon": 116.83333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Mahakam Hulu", "lat": 0.37822, "lon": 115.38048, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Balikpapan", "lat": -1.16667, "lon": 116.88333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Samarinda", "lat": -0.43333, "lon": 117.18333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Bontang", "lat": 0.12526, "lon": 117.49603, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Malinau", "lat": 2.45, "lon": 115.68333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Bulungan", "lat": 3, "lon": 117.16667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Tana Tidung", "lat": 3.55, "lon": 117.25, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Nunukan", "lat": 4.13333, "lon": 116.7, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Tarakan", "lat": 3.36667, "lon": 117.6, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Bolaang Mongondow", "lat": 0.75, "lon": 124.08333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Minahasa", "lat": 1.2537, "lon": 124.83, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Kepulauan Sangihe", "lat": 3.5, "lon": 125.55, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Kepulauan Talaud", "lat": 4.31178, "lon": 126.78085, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Minahasa Selatan", "lat": 1.21291, "lon": 124.59708, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Minahasa Utara", "lat": 1.4025, "lon": 124.96, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Bolaang Mongondow Utara", "lat": 0.78527, "lon": 123.41766, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Siau Tagulandang Biaro", "lat": 2.11728, "lon": 125.37512, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Minahasa Tenggara", "lat": 1.05633, "lon": 124.7925, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Bolaang Mongondow Selatan", "lat": 0.40912, "lon": 123.75961, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Bolaang Mongondow Timur", "lat": 0.72073, "lon": 124.50256, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Manado", "lat": 1.51667, "lon": 124.88333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Bitung", "lat": 1.48333, "lon": 125.15, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Tomohon", "lat": 1.31307, "lon": 124.83404, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Kotamobagu", "lat": 0.68915, "lon": 124.32678, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Banggai Kepulauan", "lat": -1.6424, "lon": 123.54881, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Banggai", "lat": -1.2835, "lon": 122.8892, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Morowali", "lat": -1.89342, "lon": 121.25473, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Poso", "lat": -1.65, "lon": 120.5, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Donggala", "lat": -0.58333, "lon": 119.85, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Toli-Toli", "lat": 1.30862, "lon": 120.88643, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Buol", "lat": 0.75, "lon": 120.75, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Parigi Moutong", "lat": 0.3368, "lon": 120.17841, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Tojo Una-Una", "lat": -1.2036, "lon": 121.48201, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Sigi", "lat": -1.385, "lon": 119.96694, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Banggai Laut", "lat": -1.61841, "lon": 123.49388, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Morowali Utara", "lat": -1.7207, "lon": 121.24649, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Palu", "lat": -0.86972, "lon": 119.9, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Kepulauan Selayar", "lat": -6.81667, "lon": 120.8, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Bulukumba", "lat": -5.41667, "lon": 120.23333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Bantaeng", "lat": -5.48333, "lon": 119.98333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Jeneponto", "lat": -5.63333, "lon": 119.73333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Takalar", "lat": -5.41667, "lon": 119.51667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Gowa", "lat": -5.31667, "lon": 119.75, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Sinjai", "lat": -5.21667, "lon": 120.15, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Maros", "lat": -5.05, "lon": 119.71667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Pangkajene Dan Kepulauan", "lat": -4.7827, "lon": 119.5506, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Barru", "lat": -4.43333, "lon": 119.68333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Bone", "lat": -4.7, "lon": 120.13333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Soppeng", "lat": -4.3842, "lon": 119.89, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Wajo", "lat": -4, "lon": 120.16667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Sidenreng Rappang", "lat": -3.85, "lon": 119.96667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Pinrang", "lat": -3.61667, "lon": 119.6, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Enrekang", "lat": -3.5, "lon": 119.86667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Luwu", "lat": -2.5577, "lon": 121.3242, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Tana Toraja", "lat": -3.0024, "lon": 119.79655, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Luwu Utara", "lat": -2.6, "lon": 120.25, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Luwu Timur", "lat": -2.50957, "lon": 120.3978, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Toraja Utara", "lat": -2.92738, "lon": 119.79218, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Makassar", "lat": -5.15, "lon": 119.45, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Pare-Pare", "lat": -4.03333, "lon": 119.65, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Palopo", "lat": -2.97841, "lon": 120.11078, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Buton", "lat": -5.31667, "lon": 122.58333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Muna", "lat": -4.96667, "lon": 122.66667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Konawe", "lat": -3.91717, "lon": 122.08823, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Kolaka", "lat": -4.08333, "lon": 121.66667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Konawe Selatan", "lat": -4.19191, "lon": 122.44854, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Bombana", "lat": -4.6257, "lon": 121.81641, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Wakatobi", "lat": -5.31934, "lon": 123.5948, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Kolaka Utara", "lat": -3.10452, "lon": 121.12427, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Buton Utara", "lat": -5.01457, "lon": 122.93015, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Konawe Utara", "lat": -3.41552, "lon": 121.99081, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Kolaka Timur", "lat": -4.01807, "lon": 121.86172, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Konawe Kepulauan", "lat": -4.11656, "lon": 123.10181, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Muna Barat", "lat": -4.83333, "lon": 122.48333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Buton Tengah", "lat": -5.31667, "lon": 122.33333, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Buton Selatan", "lat": -5.56667, "lon": 122.7, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Kendari", "lat": -3.98333, "lon": 122.5, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Baubau", "lat": -5.477, "lon": 122.6166, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Boalemo", "lat": 0.62689, "lon": 122.3568, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Gorontalo", "lat": 0.5728, "lon": 122.2337, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Pohuwato", "lat": 0.7098, "lon": 121.59582, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Bone Bolango", "lat": 0.50296, "lon": 123.27501, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Gorontalo Utara", "lat": 0.77, "lon": 122.31667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kota Gorontalo", "lat": 0.53333, "lon": 123.1, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Majene", "lat": -3.15, "lon": 118.86667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Polewali Mandar", "lat": -3.3, "lon": 119.16667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Mamasa", "lat": -2.96492, "lon": 119.30631, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Mamuju", "lat": -2.5, "lon": 119.41667, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Mamuju Utara", "lat": -1.51639, "lon": 119.42139, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Mamuju Tengah", "lat": -2.8212, "lon": 119.2662, "elevation": 10, "tz": "Asia/Makassar"}, {"name": "Kabupaten Maluku Tenggara Barat", "lat": -7.61186, "lon": 131.38, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Maluku Tenggara", "lat": -5.75, "lon": 132.73334, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Maluku Tengah", "lat": -3.29167, "lon": 128.9675, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Buru", "lat": -3.32767, "lon": 126.68413, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Kepulauan Aru", "lat": -6.17059, "lon": 134.46991, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Seram Bagian Barat", "lat": -3.1027, "lon": 128.42996, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Seram Bagian Timur", "lat": -3.39851, "lon": 130.39166, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Maluku Barat Daya", "lat": -7.8296, "lon": 126.17386, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Buru Selatan", "lat": -3.52187, "lon": 126.59271, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kota Ambon", "lat": -3.7, "lon": 128.18333, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kota Tual", "lat": -5.64301, "lon": 132.74934, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Halmahera Barat", "lat": 1.41709, "lon": 127.55264, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Halmahera Tengah", "lat": 0.48056, "lon": 128.25, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Kepulauan Sula", "lat": -1.8646, "lon": 125.69046, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Halmahera Selatan", "lat": -0.3955, "lon": 127.90833, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Halmahera Utara", "lat": 1.73194, "lon": 128.00778, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Halmahera Timur", "lat": 1.33517, "lon": 128.48627, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Pulau Morotai", "lat": 2.19924, "lon": 128.40546, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Pulau Taliabu", "lat": -1.84578, "lon": 124.78992, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kota Ternate", "lat": 0.89618, "lon": 127.31016, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kota Tidore Kepulauan", "lat": 0.60962, "lon": 127.56981, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Fak-Fak", "lat": -2.92641, "lon": 132.29608, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Kaimana", "lat": -3.66093, "lon": 133.77451, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Teluk Wondama", "lat": -2.7, "lon": 134.5, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Teluk Bintuni", "lat": -1.88037, "lon": 133.33105, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Manokwari", "lat": -0.9, "lon": 133.75, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Sorong Selatan", "lat": -1.50495, "lon": 132.28638, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Sorong", "lat": -1.16667, "lon": 131.5, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Raja Ampat", "lat": -0.5, "lon": 130, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Tambrauw", "lat": -0.60515, "lon": 132.48962, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Maybrat", "lat": -1.2155, "lon": 132.35092, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Manokwari Selatan", "lat": -1.0798, "lon": 133.96729, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Pegunungan Arfak", "lat": -0.93523, "lon": 133.89587, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kota Sorong", "lat": -0.86507, "lon": 131.25153, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Merauke", "lat": -7.66667, "lon": 139.66667, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Jayawijaya", "lat": -4.08333, "lon": 139.08333, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Jayapura", "lat": -3, "lon": 139.95, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Nabire", "lat": -3.54016, "lon": 135.55511, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Kepulauan Yapen", "lat": -1.78773, "lon": 136.27716, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Biak Numfor", "lat": -1.03333, "lon": 136, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Paniai", "lat": -3.9, "lon": 136.60001, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Puncak Jaya", "lat": -3.67241, "lon": 137.43896, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Mimika", "lat": -4.54357, "lon": 136.56555, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Boven Digoel", "lat": -5.70519, "lon": 140.36349, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Mappi", "lat": -6.49971, "lon": 139.34441, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Asmat", "lat": -5.3795, "lon": 138.46344, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Yahukimo", "lat": -4.60403, "lon": 139.58405, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Pegunungan Bintang", "lat": -4.52167, "lon": 140.29541, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Tolikara", "lat": -3.42661, "lon": 137.41699, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Sarmi", "lat": -2.41667, "lon": 139.08333, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Keerom", "lat": -3.3, "lon": 140.61667, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Waropen", "lat": -2.286, "lon": 137.01837, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Supiori", "lat": -0.73881, "lon": 135.61111, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Mamberamo Raya", "lat": -2.23561, "lon": 137.78229, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Nduga", "lat": -4.45093, "lon": 138.10089, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Lanny Jaya", "lat": -3.91244, "lon": 138.28766, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Mamberamo Tengah", "lat": -2.46064, "lon": 138.45245, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Yalimo", "lat": -3.86037, "lon": 138.47305, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Puncak", "lat": -4.14204, "lon": 137.09702, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Dogiyai", "lat": -4.03186, "lon": 135.43945, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Intan Jaya", "lat": -3.41016, "lon": 136.70837, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kabupaten Deiyai", "lat": -3.94737, "lon": 135.95032, "elevation": 10, "tz": "Asia/Jayapura"}, {"name": "Kota Jayapura", "lat": -2.64647, "lon": 140.77779, "elevation": 10, "tz": "Asia/Jayapura"}];
+const PROVINCIAL_CAPITALS = ["Kota Banda Aceh", "Kota Medan", "Kota Padang", "Kota Pekanbaru", "Kota Tanjung Pinang", "Kota Jambi", "Kota Palembang", "Kota Bengkulu", "Kota Bandar Lampung", "Kota Pangkal Pinang", "Kota Jakarta Pusat", "Kota Bandung", "Kota Semarang", "Kota Yogyakarta", "Kota Surabaya", "Kota Serang", "Kota Denpasar", "Kota Mataram", "Kota Kupang", "Kota Pontianak", "Kota Palangka Raya", "Kota Banjarmasin", "Kota Samarinda", "Kabupaten Bulungan", "Kota Manado", "Kota Gorontalo", "Kota Palu", "Kabupaten Mamuju", "Kota Makassar", "Kota Kendari", "Kota Ambon", "Kota Ternate", "Kota Jayapura", "Kabupaten Manokwari", "Kota Sorong", "Kabupaten Nabire", "Kabupaten Jayawijaya", "Kabupaten Merauke"];
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
+    <script>
+let currentFullResult = null;
+let currentRecapData = null;
+
+const INDO_DAYS = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+const HIST_SINGLE_KEY = 'hilal_eye_hist_single';
+const HIST_RECAP_KEY = 'hilal_eye_hist_recap';
+
+let obsPicker, recapPicker;
+
+// --- IndexedDB Setup ---
+const DB_NAME = 'HilalEyeDB';
+const DB_VERSION = 1;
+const idbPromise = new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onerror = e => reject(e.target.error);
+    request.onupgradeneeded = e => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('keyval')) db.createObjectStore('keyval');
+    };
+    request.onsuccess = e => resolve(e.target.result);
+});
+
+async function idbGet(key) {
+    try {
+        const db = await idbPromise;
+        return new Promise((res, rej) => {
+            const req = db.transaction('keyval', 'readonly').objectStore('keyval').get(key);
+            req.onsuccess = () => res(req.result);
+            req.onerror = () => rej(req.error);
+        });
+    } catch(e) { return null; }
+}
+
+async function idbSet(key, val) {
+    try {
+        const db = await idbPromise;
+        return new Promise((res, rej) => {
+            const req = db.transaction('keyval', 'readwrite').objectStore('keyval').put(val, key);
+            req.onsuccess = () => res();
+            req.onerror = () => rej(req.error);
+        });
+    } catch(e) {}
+}
+
+async function idbDelete(key) {
+    try {
+        const db = await idbPromise;
+        return new Promise((res, rej) => {
+            const req = db.transaction('keyval', 'readwrite').objectStore('keyval').delete(key);
+            req.onsuccess = () => res();
+            req.onerror = () => rej(req.error);
+        });
+    } catch(e) {}
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    refreshHistoryList('single');
+    refreshHistoryList('recap');
+    const savedKey = await idbGet('gemini_api_key');
+    if (savedKey) document.getElementById('gemini-key').value = savedKey;
+
+    // Populate City List
+    const cityListId = document.getElementById('city-list');
+    if (typeof CITIES !== 'undefined') {
+        CITIES.forEach(city => {
+            const opt = document.createElement('option');
+            opt.value = city.name;
+            cityListId.appendChild(opt);
+        });
+    }
+
+    const config = {
+        dateFormat: "d/m/Y",
+        allowInput: true,
+        disableMobile: true,
+        onChange: function(selectedDates, dateStr, instance) {
+            const inputId = instance.element.id;
+            const labelId = inputId === 'obs-date' ? 'obs-day-name' : 'recap-day-name';
+            if (selectedDates.length > 0) {
+                document.getElementById(labelId).textContent = INDO_DAYS[selectedDates[0].getDay()];
+            }
+        }
+    };
+
+    obsPicker = flatpickr("#obs-date", { ...config, defaultDate: "19/03/2026" });
+    recapPicker = flatpickr("#recap-date", { ...config, defaultDate: "19/03/2026" });
+    
+    updateDayLabelManual('obs-date', 'obs-day-name');
+    updateDayLabelManual('recap-date', 'recap-day-name');
+
+    refreshHistoryList('single');
+    refreshHistoryList('recap');
+});
+
+function updateDayLabelManual(inputId, labelId) {
+    const picker = inputId === 'obs-date' ? obsPicker : recapPicker;
+    if (picker && picker.selectedDates.length > 0) {
+        document.getElementById(labelId).textContent = INDO_DAYS[picker.selectedDates[0].getDay()];
+    }
+}
+
+function getISODate(picker) {
+    if (!picker || picker.selectedDates.length === 0) return null;
+    const d = picker.selectedDates[0];
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function switchTab(tabId, element) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(`tab-${tabId}`).classList.add('active');
+    if (element) {
+        element.classList.add('active');
+    }
+}
+
+// --- ASTRONOMY LOGIC (Replace Flask/Skyfield) ---
+function calculateHilalJS(cityName, dateIsoStr) {
+    const city = typeof CITIES !== 'undefined' ? CITIES.find(c => c.name === cityName) : null;
+    if (!city) return { error: "Kota tidak ditemukan di database." };
+
+    const lat = city.lat;
+    const lon = city.lon;
+    const elevation = city.elevation;
+    
+    // Convert to UTC by forcing hour to 12 local time (WIB roughly)
+    const d = new Date(`${dateIsoStr}T12:00:00+07:00`);
+    
+    // Get sunset
+    const times = SunCalc.getTimes(d, lat, lon, elevation);
+    const sunset = times.sunset;
+    
+    if (isNaN(sunset)) return { error: "Matahari tidak terbenam hari ini di lokasi tersebut." };
+    
+    // Sun position at sunset
+    const sunPos = SunCalc.getPosition(sunset, lat, lon);
+    const sunAlt = sunPos.altitude * 180 / Math.PI;
+    const sunAz = (sunPos.azimuth * 180 / Math.PI) + 180;
+    
+    // Moon position at sunset
+    const moonPos = SunCalc.getMoonPosition(sunset, lat, lon);
+    const moonAlt = moonPos.altitude * 180 / Math.PI;
+    const moonAz = (moonPos.azimuth * 180 / Math.PI) + 180;
+    
+    const moonTimes = SunCalc.getMoonTimes(d, lat, lon);
+    const moonset = moonTimes.set;
+    
+    // Angular Elongation
+    const dAz = (moonPos.azimuth - sunPos.azimuth);
+    const elongasiRad = Math.acos( Math.sin(sunPos.altitude)*Math.sin(moonPos.altitude) + Math.cos(sunPos.altitude)*Math.cos(moonPos.altitude)*Math.cos(dAz) );
+    const elongasi = elongasiRad * 180 / Math.PI;
+    
+    const lagTime = (moonset && moonset > sunset) ? (moonset - sunset) / 60000 : 0;
+    
+    const illum = SunCalc.getMoonIllumination(d);
+    // Approximate moon age in hours since last New Moon using phase (0 to 1 = 29.53 days)
+    const moonAgeHours = (illum.phase * 29.530589 * 24);
+    
+    let mabims = "Tidak Memenuhi";
+    if (moonAlt >= 3.0 && elongasi >= 6.4) mabims = "Ya (Terpenuhi)";
+    
+    let danjon = elongasi < 7.0 ? "Tidak (Di bawah Limit Danjon)" : "Ya (Di atas Limit)";
+    
+    let odeh = "Invisible";
+    let w_calc = moonAlt - (0.019 * elongasi * elongasi) + (0.47 * elongasi) - 1.5;
+    if (elongasi < 7.0) {
+        odeh = "Invisible"; // Danjon limit overrides Odeh
+    } else {
+        if (w_calc > 7.16) odeh = "A (Mudah Terlihat)";
+        else if (w_calc >= 0) odeh = "B (Mungkin Terlihat)";
+        else if (w_calc > -3) odeh = "C (Butuh Alat Optik)";
+        else if (w_calc > -4.5) odeh = "D (Sangat Sulit)";
+    }
+    
+    const df = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute:'2-digit', second:'2-digit', timeZoneName: 'short' });
+    
+    return {
+        "Lokasi": city.name,
+        "Tanggal": dateIsoStr,
+        "Sunset": df.format(sunset),
+        "Azimuth Matahari": sunAz.toFixed(3),
+        "Altitude Matahari": sunAlt.toFixed(3),
+        "Moonset": moonset ? df.format(moonset) : "Tidak Set",
+        "Azimuth Bulan": moonAz.toFixed(3),
+        "Altitude Hilal": moonAlt.toFixed(3),
+        "Elongasi": elongasi.toFixed(3),
+        "Umur Bulan (Jam)": moonAgeHours.toFixed(1),
+        "Lag Time (Menit)": lagTime.toFixed(1),
+        "MABIMS": mabims,
+        "Odeh": odeh,
+        "Danjon Limit": danjon,
+        "Plot Path": "",
+        "sunAz": sunAz,
+        "moonAz": moonAz,
+        "moonAlt": moonAlt
+    };
+}
+
+function drawHilalVisualization(data) {
+    const container = document.querySelector('.visual-container');
+    container.style.display = 'block';
+    
+    const existingSvg = container.querySelector('svg');
+    if (existingSvg) existingSvg.remove();
+    if (document.getElementById('hilal-plot')) document.getElementById('hilal-plot').style.display = 'none';
+
+    const width = 800;
+    const height = 500;
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    svg.style.width = "100%";
+    svg.style.height = "auto";
+    svg.style.background = "#020b1a";
+    svg.style.borderRadius = "15px";
+    svg.style.border = "1px solid rgba(255,255,255,0.1)";
+
+    const horizonY = height - 100;
+    
+    // Grid Setup
+    const centerAz = parseFloat(data["Azimuth Matahari"]);
+    const scale = 40; // pixels per degree
+    const getX = (az) => (width / 2) + ((az - centerAz) * scale);
+    const getY = (alt) => horizonY - (alt * scale);
+
+    // Draw Grid Lines
+    const maxDegreeDiff = Math.ceil(width / (2 * scale));
+    const gGrid = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    gGrid.setAttribute("stroke", "rgba(255,255,255,0.1)");
+    gGrid.setAttribute("stroke-width", "1");
+    gGrid.setAttribute("stroke-dasharray", "4 4");
+
+    // Vertical Azimuth Lines
+    for(let d = -maxDegreeDiff; d <= maxDegreeDiff; d++) {
+        let az = centerAz + d;
+        let x = getX(az);
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x); line.setAttribute("y1", 0);
+        line.setAttribute("x2", x); line.setAttribute("y2", horizonY);
+        gGrid.appendChild(line);
+        
+        // Azimuth Labels
+        const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        txt.setAttribute("x", x); txt.setAttribute("y", horizonY + 20);
+        txt.setAttribute("fill", "#888"); txt.setAttribute("text-anchor", "middle");
+        txt.setAttribute("font-size", "10px");
+        txt.textContent = `${az.toFixed(0)}°`;
+        gGrid.appendChild(txt);
+    }
+    
+    // Horizontal Altitude Lines
+    for(let alt = 0; alt <= 15; alt++) {
+        let y = getY(alt);
+        if (y < 0) continue;
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", 0); line.setAttribute("y1", y);
+        line.setAttribute("x2", width); line.setAttribute("y2", y);
+        gGrid.appendChild(line);
+
+        // Altitude Labels
+        if(alt > 0) {
+            const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            txt.setAttribute("x", 20); txt.setAttribute("y", y + 4);
+            txt.setAttribute("fill", "#888");
+            txt.setAttribute("font-size", "10px");
+            txt.textContent = `${alt}°`;
+            gGrid.appendChild(txt);
+        }
+    }
+    svg.appendChild(gGrid);
+
+    // Horizon Fill
+    const horizon = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    horizon.setAttribute("x", "0"); horizon.setAttribute("y", horizonY);
+    horizon.setAttribute("width", width); horizon.setAttribute("height", "100");
+    horizon.setAttribute("fill", "#0a1f3d");
+    svg.appendChild(horizon);
+    
+    // MABIMS Limits
+    const mabimsAltY = getY(3.0);
+    const mabimsElongR = scale * 6.4;
+
+    // MABIMS Elongation 6.4 Arc
+    const elongArc = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    elongArc.setAttribute("cx", width / 2); elongArc.setAttribute("cy", horizonY);
+    elongArc.setAttribute("r", mabimsElongR);
+    elongArc.setAttribute("stroke", "rgba(255, 100, 100, 0.5)");
+    elongArc.setAttribute("stroke-width", "2");
+    elongArc.setAttribute("stroke-dasharray", "8 4");
+    elongArc.setAttribute("fill", "transparent");
+    svg.appendChild(elongArc);
+    
+    // MABIMS Altitude 3.0 Line
+    const altLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    altLine.setAttribute("x1", 0); altLine.setAttribute("y1", mabimsAltY);
+    altLine.setAttribute("x2", width); altLine.setAttribute("y2", mabimsAltY);
+    altLine.setAttribute("stroke", "rgba(255, 100, 100, 0.5)");
+    altLine.setAttribute("stroke-width", "2");
+    altLine.setAttribute("stroke-dasharray", "8 4");
+    svg.appendChild(altLine);
+
+    const mabimsTextAlt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    mabimsTextAlt.setAttribute("x", width - 150); mabimsTextAlt.setAttribute("y", mabimsAltY - 5);
+    mabimsTextAlt.setAttribute("fill", "rgba(255, 100, 100, 0.8)");
+    mabimsTextAlt.setAttribute("font-size", "11px");
+    mabimsTextAlt.textContent = "Batas MABIMS (Alt 3°)";
+    svg.appendChild(mabimsTextAlt);
+
+    const mabimsTextElon = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    mabimsTextElon.setAttribute("x", (width / 2) + mabimsElongR + 5); 
+    mabimsTextElon.setAttribute("y", horizonY - 10);
+    mabimsTextElon.setAttribute("fill", "rgba(255, 100, 100, 0.8)");
+    mabimsTextElon.setAttribute("font-size", "11px");
+    mabimsTextElon.textContent = "Batas MABIMS (Elon 6.4°)";
+    svg.appendChild(mabimsTextElon);
+    
+    // Horizon Line
+
+    const horizonLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    horizonLine.setAttribute("x1", 0); horizonLine.setAttribute("y1", horizonY);
+    horizonLine.setAttribute("x2", width); horizonLine.setAttribute("y2", horizonY);
+    horizonLine.setAttribute("stroke", "#ffaa00"); horizonLine.setAttribute("stroke-width", "2");
+    svg.appendChild(horizonLine);
+
+    // Sun Marker
+    const sunMarker = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    sunMarker.setAttribute("cx", width / 2); sunMarker.setAttribute("cy", horizonY);
+    sunMarker.setAttribute("r", "15"); sunMarker.setAttribute("fill", "url(#sunGradient)");
+    
+    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    const sunGrad = document.createElementNS("http://www.w3.org/2000/svg", "radialGradient");
+    sunGrad.setAttribute("id", "sunGradient");
+    sunGrad.innerHTML = '<stop offset="0%" stop-color="#ffcc33" /><stop offset="100%" stop-color="#ff6600" stop-opacity="0" />';
+    defs.appendChild(sunGrad); svg.appendChild(defs); svg.appendChild(sunMarker);
+
+    // Sun Label
+    const sunText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    sunText.setAttribute("x", width / 2); sunText.setAttribute("y", horizonY + 40);
+    sunText.setAttribute("fill", "#ffaa00"); sunText.setAttribute("text-anchor", "middle");
+    sunText.setAttribute("font-size", "12px"); sunText.setAttribute("font-weight", "bold");
+    sunText.textContent = "MATAHARI";
+    svg.appendChild(sunText);
+
+    // Moon Marker
+    const moonAlt = parseFloat(data["Altitude Hilal"]);
+    const moonX = getX(parseFloat(data["Azimuth Bulan"]));
+    const moonY = getY(moonAlt);
+    
+    const moon = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    moon.setAttribute("cx", moonX); moon.setAttribute("cy", moonY);
+    moon.setAttribute("r", "8"); moon.setAttribute("fill", "#ffffff");
+    moon.setAttribute("filter", "drop-shadow(0px 0px 4px rgba(255,255,255,0.8))");
+    svg.appendChild(moon);
+
+    // Moon Box & Exact Label
+    const textGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    const moonTextBg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    moonTextBg.setAttribute("x", moonX + 15); moonTextBg.setAttribute("y", moonY - 25);
+    moonTextBg.setAttribute("width", "110"); moonTextBg.setAttribute("height", "40");
+    moonTextBg.setAttribute("fill", "rgba(0,0,0,0.7)"); moonTextBg.setAttribute("rx", "5");
+    textGroup.appendChild(moonTextBg);
+
+    const moonText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    moonText.setAttribute("x", moonX + 20); moonText.setAttribute("y", moonY - 10);
+    moonText.setAttribute("fill", "#ffffff"); moonText.setAttribute("font-size", "12px");
+    moonText.setAttribute("font-weight", "bold");
+    moonText.textContent = "HILAL";
+    textGroup.appendChild(moonText);
+    
+    const moonAltText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    moonAltText.setAttribute("x", moonX + 20); moonAltText.setAttribute("y", moonY + 5);
+    moonAltText.setAttribute("fill", "#aaaaaa"); moonAltText.setAttribute("font-size", "10px");
+    moonAltText.textContent = `Alt: ${moonAlt.toFixed(2)}°`;
+    textGroup.appendChild(moonAltText);
+
+    svg.appendChild(textGroup);
+
+    // Draw Elongation connection line
+    const elonLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    elonLine.setAttribute("x1", width / 2); elonLine.setAttribute("y1", horizonY);
+    elonLine.setAttribute("x2", moonX); elonLine.setAttribute("y2", moonY);
+    elonLine.setAttribute("stroke", "rgba(255, 204, 51, 0.4)");
+    elonLine.setAttribute("stroke-width", "2");
+    elonLine.setAttribute("stroke-dasharray", "5 5");
+    svg.appendChild(elonLine);
+
+    container.appendChild(svg);
+}
+
+// --- History UI ---
+async function refreshHistoryList(type) {
+    const list = document.getElementById(`history-list-${type}`);
+    const key = type === 'single' ? HIST_SINGLE_KEY : HIST_RECAP_KEY;
+    let history = await idbGet(key) || [];
+    
+    list.innerHTML = '';
+    if (history.length === 0) {
+        list.innerHTML = `<p class="empty-msg">Belum ada riwayat ${type === 'single' ? '' : 'recap'}.</p>`;
+        return;
+    }
+    history.slice().reverse().forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        const realIdx = history.length - 1 - idx;
+        div.onclick = () => restoreFromHistory(type, realIdx);
+        div.innerHTML = `<div class="info"><span class="name">${type === 'single' ? item.Lokasi : 'Rekap Nasional'}</span><span class="date">${item.Tanggal || (item.data && item.data[0] ? item.data[0].Tanggal : 'Data Rekap')}</span></div><i class="fas fa-chevron-right"></i>`;
+        list.appendChild(div);
+    });
+}
+
+async function saveToHistory(type, data) {
+    const key = type === 'single' ? HIST_SINGLE_KEY : HIST_RECAP_KEY;
+    let history = await idbGet(key) || [];
+    const isDup = history.some(item => (type === 'single' && item.Lokasi === data.Lokasi && item.Tanggal === data.Tanggal) || (type === 'recap' && item.Tanggal === data.Tanggal));
+    if (isDup) return;
+    history.push(data);
+    if (history.length > 20) history.shift();
+    await idbSet(key, history);
+    refreshHistoryList(type);
+}
+
+async function clearHistory(type) {
+    if (confirm(`Hapus semua riwayat ${type === 'single' ? 'perhitungan' : 'rekap'}?`)) {
+        await idbDelete(type === 'single' ? HIST_SINGLE_KEY : HIST_RECAP_KEY);
+        refreshHistoryList(type);
+    }
+}
+
+async function restoreFromHistory(type, index) {
+    const key = type === 'single' ? HIST_SINGLE_KEY : HIST_RECAP_KEY;
+    let history = await idbGet(key) || [];
+    const data = history[index];
+    if (type === 'single') {
+        currentFullResult = data;
+        renderResult(data);
+        document.getElementById('city-input').value = data.Lokasi;
+    } else {
+        currentRecapData = data.data;
+        renderRecapTable(data.data);
+    }
+}
+
+// Single City Calculation
+document.getElementById('calculate-btn').addEventListener('click', () => {
+    const city = document.getElementById('city-input').value;
+    const date = getISODate(obsPicker);
+    if (!city || !date) { alert('Mohon pilih kota dan tanggal terlebih dahulu.'); return; }
+    
+    showLoader('Menghitung parameter astronomis...');
+    document.getElementById('result-section').classList.add('hidden');
+    
+    setTimeout(() => {
+        const data = calculateHilalJS(city, date);
+        hideLoader();
+        if (data.error) { alert(data.error); return; }
+        currentFullResult = data;
+        renderResult(data);
+        saveToHistory('single', data);
+    }, 300);
+});
+
+function renderResult(data) {
+    document.getElementById('result-section').classList.remove('hidden');
+    document.getElementById('res-location').textContent = data.Lokasi;
+    document.getElementById('res-date').textContent = data.Tanggal;
+    document.getElementById('val-sunset').textContent = data.Sunset;
+    document.getElementById('val-sun-az').textContent = data['Azimuth Matahari'];
+    document.getElementById('val-sun-alt').textContent = data['Altitude Matahari'] || '0';
+    document.getElementById('val-moonset').textContent = data.Moonset;
+    document.getElementById('val-moon-az').textContent = data['Azimuth Bulan'];
+    document.getElementById('val-moon-alt').textContent = data['Altitude Hilal'];
+    document.getElementById('val-elongation').textContent = data.Elongasi;
+    document.getElementById('val-age').textContent = data['Umur Bulan (Jam)'];
+    document.getElementById('val-lag').textContent = data['Lag Time (Menit)'];
+    
+    const mabims = document.getElementById('stat-mabims');
+    mabims.textContent = data.MABIMS;
+    mabims.className = 'badge ' + (data.MABIMS.includes('Tidak') ? 'danger' : 'success');
+    
+    const odeh = document.getElementById('stat-odeh');
+    odeh.textContent = data.Odeh;
+    odeh.className = 'badge ' + ((data.Odeh.includes('Invisible') || data.Odeh.includes('D')) ? 'danger' : 'success');
+    
+    const danjon = document.getElementById('stat-danjon');
+    danjon.textContent = data['Danjon Limit'];
+    danjon.className = 'badge ' + (data['Danjon Limit'].includes('Tidak') ? 'danger' : 'success');
+    
+    
+    // Show SVG visualization
+    drawHilalVisualization(data);
+}
+
+// Recap Nasional
+document.getElementById('recap-btn').addEventListener('click', () => {
+    const date = getISODate(recapPicker);
+    if (!date) { alert('Mohon pilih tanggal terlebih dahulu.'); return; }
+    
+    showLoader('Menghitung Rekap Nasional...');
+    document.getElementById('recap-result').classList.add('hidden');
+    
+    setTimeout(() => {
+        const results = [];
+        if (typeof PROVINCIAL_CAPITALS !== 'undefined') {
+            PROVINCIAL_CAPITALS.forEach(cityName => {
+                const res = calculateHilalJS(cityName, date);
+                if (!res.error) results.push({
+                    Lokasi: res.Lokasi, Sunset: res.Sunset, Altitude: res['Altitude Hilal'],
+                    Elongasi: res.Elongasi, MABIMS: res.MABIMS, Odeh: res.Odeh
+                });
+            });
+        }
+        hideLoader();
+        currentRecapData = results;
+        renderRecapTable(results);
+        saveToHistory('recap', { data: results, Tanggal: `Rekap ${date}` });
+    }, 500);
+});
+
+function renderRecapTable(data) {
+    const body = document.getElementById('recap-body');
+    body.innerHTML = '';
+    data.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${item.Lokasi}</td><td>${item.Sunset}</td><td>${item.Altitude}°</td><td>${item.Elongasi}°</td>
+            <td><span class="badge ${item.MABIMS.includes('Tidak') ? 'danger' : 'success'}">${item.MABIMS}</span></td>
+            <td><span class="badge ${(item.Odeh.includes('Invisible') || item.Odeh.includes('D')) ? 'danger' : 'success'}">${item.Odeh}</span></td>`;
+        body.appendChild(tr);
+    });
+    document.getElementById('recap-result').classList.remove('hidden');
+}
+
+function sortTable(n) {
+    if (!currentRecapData) return;
+    const keys = ['Lokasi', 'Sunset', 'Altitude', 'Elongasi', 'MABIMS', 'Odeh'];
+    const key = keys[n];
+    
+    // Sort table globally
+    window.__tableAsc = !window.__tableAsc;
+    const isAsc = window.__tableAsc;
+    
+    currentRecapData.sort((a, b) => {
+        let valA = a[key], valB = b[key];
+        if (key === 'Altitude' || key === 'Elongasi') { valA = parseFloat(valA); valB = parseFloat(valB); }
+        if (valA < valB) return isAsc ? -1 : 1;
+        if (valA > valB) return isAsc ? 1 : -1;
+        return 0;
+    });
+    renderRecapTable(currentRecapData);
+}
+
+// Exports (Web version uses CSV blobs)
+document.getElementById('export-recap-csv').addEventListener('click', () => {
+    if (!currentRecapData) return;
+    let csvContent = "data:text/csv;charset=utf-8,Lokasi,Sunset,Altitude,Elongasi,MABIMS,Odeh\n";
+    currentRecapData.forEach(row => { csvContent += `${row.Lokasi},${row.Sunset},${row.Altitude},${row.Elongasi},${row.MABIMS},${row.Odeh}\n`; });
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `recap_hilal_${getISODate(recapPicker)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+});
+document.getElementById('export-recap-xlsx').addEventListener('click', () => alert('Export XLSX butuh server backend. Silakan gunakan Export CSV.'));
+
+// downloadAs for Single Tab
+async function downloadAs(format) {
+    if (!currentFullResult) return;
+    let content = "";
+    let filename = `report_hilal_${currentFullResult.Lokasi}_${currentFullResult.Tanggal}`;
+    let type = "text/plain";
+
+    if (format === 'csv') {
+        content = "Parameter,Nilai\n";
+        for (const [k, v] of Object.entries(currentFullResult)) {
+            if (!['sunAz', 'moonAz', 'moonAlt', 'Plot Path'].includes(k)) {
+                content += `${k},"${v}"\n`;
+            }
+        }
+        type = "text/csv";
+        filename += ".csv";
+    } else if (format === 'md') {
+        content = `# Report Hilal: ${currentFullResult.Lokasi}\n\n`;
+        content += `**Tanggal:** ${currentFullResult.Tanggal}\n\n`;
+        content += "| Parameter | Nilai |\n|---|---|\n";
+        for (const [k, v] of Object.entries(currentFullResult)) {
+            if (!['sunAz', 'moonAz', 'moonAlt', 'Plot Path'].includes(k)) {
+                content += `| ${k} | ${v} |\n`;
+            }
+        }
+        type = "text/markdown";
+        filename += ".md";
+    } else {
+        content = `REPORT HILAL EYE\n===============\n\n`;
+        for (const [k, v] of Object.entries(currentFullResult)) {
+            if (!['sunAz', 'moonAz', 'moonAlt', 'Plot Path'].includes(k)) {
+                content += `${k}: ${v}\n`;
+            }
+        }
+        filename += ".txt";
+    }
+
+    const blob = new Blob([content], { type: type });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+// --- Direct Gemini API Chat (Client Side) ---
+let chatHistory = [];
+document.getElementById('gemini-key').addEventListener('change', async (e) => {
+    await idbSet('gemini_api_key', e.target.value.trim());
+});
+document.getElementById('send-chat-btn').addEventListener('click', () => sendChatMessage());
+document.getElementById('chat-input').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); } });
+
+async function sendChatMessage() {
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    const apiKey = document.getElementById('gemini-key').value;
+    if (!message || !apiKey) { alert('API Key Gemini & Pesan wajib diisi!'); return; }
+
+    appendMessage('user', message);
+    input.value = '';
+    const chatMsgs = document.getElementById('chat-messages');
+    chatMsgs.scrollTop = chatMsgs.scrollHeight;
+
+    let contextPayload = {};
+    if (currentFullResult && Object.keys(currentFullResult).length > 0) {
+        contextPayload["Data Kalkulator Kota Utama"] = currentFullResult;
+    }
+    if (currentRecapData && currentRecapData.length > 0) {
+        const dateRaw = document.getElementById('recap-date').value || "Hari ini";
+        contextPayload["Data Rekap Nasional"] = { "Tanggal Observasi": dateRaw, "Daftar Kota": [] };
+        currentRecapData.slice(0, 10).forEach((item, index) => { contextPayload["Data Rekap Nasional"]["Daftar Kota"].push(`${item.Lokasi} | Alt: ${item.Altitude}° | Elong: ${item.Elongasi}° | MABIMS: ${item.MABIMS}`); });
+    }
+    
+    // If no context currently generated in the session, pull from history
+    if (Object.keys(contextPayload).length === 0) {
+        try {
+            const histSingle = await idbGet(HIST_SINGLE_KEY) || [];
+            const histRecap = await idbGet(HIST_RECAP_KEY) || [];
+            if (histSingle.length > 0) Object.assign(contextPayload, { "Data Kalkulator Kota (Riwayat)": histSingle[histSingle.length - 1] });
+            if (histRecap.length > 0) {
+               const latestRecapObj = histRecap[histRecap.length - 1];
+               contextPayload["Data Rekap Nasional (Riwayat)"] = { "Tanggal Observasi": latestRecapObj.Tanggal };
+               contextPayload["Data Rekap Nasional (Riwayat)"]["Daftar Kota"] = latestRecapObj.data.slice(0, 10).map(item => `${item.Lokasi} | Alt: ${item.Altitude}° | Elong: ${item.Elongasi}° | MABIMS: ${item.MABIMS}`);
+            }
+        } catch(e) {}
+    }
+
+    let ctxText = "DATA PERHITUNGAN TERBARU: [KOSONG]\n";
+    if (Object.keys(contextPayload).length > 0) {
+        ctxText = "DATA PERHITUNGAN TERBARU (PENTING: GUNAKAN INI SEBAGAI SUMBER UTAMA):\n" + JSON.stringify(contextPayload, null, 2);
+    }
+
+    const systemPrompt = "Anda adalah Konsultan Astronomi Hilal-Eye. Tugas utama Anda adalah menyimpulkan kapan awal bulan Hijriah (misalnya 1 Syawal/Lebaran atau 1 Ramadhan) berdasarkan 'DATA PERHITUNGAN TERBARU' yang diberikan. Perhatikan kedua jenis data (Kalkulator Kota & Rekap Nasional) jika tersedia, dan tarik kesimpulan general.\nATURAN DEDUKSI KALENDER:\n1. Perhatikan 'Tanggal Observasi' yang ada di data (Ini biasanya adalah tanggal 29 bulan Hijriah).\n2. Jika kriteria MABIMS 'Tidak Memenuhi', bulan berjalan digenapkan 30 hari (istikmal), dan bulan baru (misal Lebaran) akan jatuh PADA LUSA dari tanggal observasi.\n3. Jika kriteria MABIMS 'Ya', bulan baru jatuh PADA KEESOKAN HARINYA.\nJawablah santai namun profesional dan presisi. GUNAKAN FORMAT MARKDOWN.";
+
+    const loadingId = 'ai-loading-' + Date.now();
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = `message ai-message`;
+    loadingDiv.id = loadingId;
+    loadingDiv.innerHTML = '<span style="color:var(--accent-gold);"><i class="fas fa-spinner fa-spin"></i> AI sedang menganalisis data perhitungan hilal...</span>';
+    chatMsgs.appendChild(loadingDiv);
+    chatMsgs.scrollTop = chatMsgs.scrollHeight;
+
+    try {
+        const payload = {
+            contents: [{ role: "user", parts: [{ text: `${systemPrompt}\n\n${ctxText}\n\nUser Question: ${message}` }] }],
+            generationConfig: { temperature: 0.2 }
+        };
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        const lDiv = document.getElementById(loadingId);
+        if (lDiv) lDiv.remove();
+        
+        if (data.error) appendMessage('ai', `Error Gemini: ${data.error.message}`);
+        else appendMessage('ai', data.candidates[0].content.parts[0].text);
+    } catch (err) { 
+        const lDiv = document.getElementById(loadingId);
+        if (lDiv) lDiv.remove();
+        appendMessage('ai', 'Gagal menghubungi Gemini API. Cek koneksi internet dan validitas API Key Anda.'); 
+    }
+    finally { chatMsgs.scrollTop = chatMsgs.scrollHeight; }
+}
+
+function appendMessage(role, text) {
+    const container = document.getElementById('chat-messages');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${role}-message`;
+    if (role === 'ai') msgDiv.innerHTML = marked.parse(text);
+    else msgDiv.textContent = text;
+    container.appendChild(msgDiv);
+}
+
+// Webapp chat exports
+function copyToClipboard() { /* generic */ }
+function toggleChatFullscreen() {
+    const cw = document.getElementById('chat-wrapper'), icon = document.querySelector('#toggle-fullscreen-btn i');
+    cw.classList.toggle('fullscreen-chat');
+    if (cw.classList.contains('fullscreen-chat')) { icon.classList.remove('fa-expand'); icon.classList.add('fa-compress'); }
+    else { icon.classList.remove('fa-compress'); icon.classList.add('fa-expand'); }
+}
+function copyChat() {
+    const msgs = Array.from(document.querySelectorAll('#chat-messages .message')).map(m => `${m.classList.contains('user-message')?'Anda':'AI'}:\n${m.innerText}\n\n`).join('');
+    navigator.clipboard.writeText(msgs).then(() => alert('Seluruh chat berhasil disalin!'));
+}
+function downloadChat(format) { 
+    const msgs = Array.from(document.querySelectorAll('#chat-messages .message')).map(m => `${m.classList.contains('user-message')?'Anda':'AI'}:\n${m.innerText}\n\n`).join('');
+    const blob = new Blob([msgs], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `chat_hilal_eye_${new Date().getTime()}.${format === 'docx' ? 'txt' : format}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    if (format === 'docx') alert('Format DOCX dikonversi ke TXT karena batasan client-side.');
+}
+function printChat() { window.print(); }
+
+function showLoader(text) {
+    const loader = document.getElementById('loader');
+    const loaderText = document.getElementById('loader-text');
+    if (text && loaderText) loaderText.textContent = text;
+    if (loader) loader.classList.remove('hidden');
+}
+
+function hideLoader() {
+    const loader = document.getElementById('loader');
+    if (loader) loader.classList.add('hidden');
+}
+
+</script>
+</body>
+</html>
+
+

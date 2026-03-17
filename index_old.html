@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hilal-Eye | Accurate Hilal Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Load FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Flatpickr for premium Date Picker -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    
+    <main class="container">
+        <header>
+            <h1><i class="fas fa-moon"></i> Hilal-Eye</h1>
+            <p>Sistem Pemantauan Hilal Astronomis Terakurat</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" onclick="switchTab('calculator', this)"><i class="fas fa-calculator"></i> Kalkulator Kota</button>
+            <button class="tab-btn" onclick="switchTab('recap', this)"><i class="fas fa-globe-asia"></i> Rekap Nasional</button>
+            <button class="tab-btn" onclick="switchTab('ai', this)"><i class="fas fa-robot"></i> Konsultan AI</button>
+        </nav>
+
+        <section id="tab-calculator" class="tab-content active">
+            <section class="glass-card input-section">
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="city-input"><i class="fas fa-search-location"></i> Cari Kabupaten/Kota</label>
+                        <input type="text" id="city-input" list="city-list" placeholder="Ketik nama kota...">
+                        <datalist id="city-list">
+                            <!-- City options will be loaded dynamically by JS -->
+                        </datalist>
+                    </div>
+                    <div class="input-group">
+                        <label for="obs-date"><i class="fas fa-calendar-alt"></i> Tanggal Pengamatan</label>
+                        <div class="date-wrapper">
+                            <input type="date" id="obs-date" value="2026-03-19">
+                            <span id="obs-day-name" class="day-badge">Kamis</span>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <button id="calculate-btn" class="btn-primary">Hitung Posisi Hilal</button>
+                    </div>
+                </div>
+
+                <!-- History Panel for Calculator -->
+                <div class="history-panel glass-card" id="history-single">
+                    <div class="history-header">
+                        <h4><i class="fas fa-history"></i> Riwayat Perhitungan</h4>
+                        <button class="btn-text" onclick="clearHistory('single')">Hapus Semua</button>
+                    </div>
+                    <div class="history-list" id="history-list-single">
+                        <p class="empty-msg">Belum ada riwayat.</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="criteria-notes glass-card" style="margin-top: 2rem;">
+                <h4><i class="fas fa-info-circle"></i> Keterangan Kriteria Visibilitas</h4>
+                <div class="notes-grid">
+                    <div class="note-item">
+                        <strong>MABIMS (Baru):</strong>
+                        <span>Tinggi Hilal min. 3° DAN Elongasi min. 6.4°. Keduanya harus terpenuhi.</span>
+                    </div>
+                    <div class="note-item">
+                        <strong>Danjon Limit:</strong>
+                        <span>Hilal dianggap mustahil terlihat jika elongasi di bawah 7° (Limit fisik pantulan cahaya).</span>
+                    </div>
+                    <div class="note-item">
+                        <strong>Kriteria Odeh:</strong>
+                        <span>Berdasarkan ketebalan sabit dan kontras cahaya. A=Mudah, B=Mungkin, C/D=Butuh Optik, Invisible=Tidak Mungkin.</span>
+                    </div>
+                </div>
+            </div>
+
+            <section id="result-section" class="result-container hidden">
+                <div class="glass-card result-card" id="printable-result">
+                    <div class="result-header">
+                        <h2 id="res-location">Jakarta</h2>
+                        <p id="res-date">19 March 2026</p>
+                    </div>
+                    
+                    <div class="result-grid">
+                        <div class="data-group">
+                            <h3><i class="fas fa-sun"></i> Data Matahari</h3>
+                            <p>Sunset: <span id="val-sunset"></span></p>
+                            <p>Azimuth: <span id="val-sun-az"></span>°</p>
+                            <p>Altitude: <span id="val-sun-alt"></span>°</p>
+                        </div>
+                        <div class="data-group">
+                            <h3><i class="fas fa-moon"></i> Data Bulan</h3>
+                            <p>Moonset: <span id="val-moonset"></span></p>
+                            <p>Azimuth: <span id="val-moon-az"></span>°</p>
+                            <p>Altitude: <span id="val-moon-alt"></span>°</p>
+                        </div>
+                        <div class="data-group">
+                            <h3><i class="fas fa-sliders-h"></i> Parameter Hilal</h3>
+                            <p>Elongasi: <span id="val-elongation"></span>°</p>
+                            <p>Umur Bulan: <span id="val-age"></span> jam</p>
+                            <p>Lag Time: <span id="val-lag"></span> menit</p>
+                        </div>
+                        <div class="data-group status-box">
+                            <h3><i class="fas fa-eye"></i> Status Visibilitas</h3>
+                            <div class="status-item">
+                                <label>MABIMS:</label>
+                                <span id="stat-mabims" class="badge"></span>
+                            </div>
+                            <div class="status-item">
+                                <label>Odeh:</label>
+                                <span id="stat-odeh" class="badge"></span>
+                            </div>
+                            <div class="status-item">
+                                <label>Danjon:</label>
+                                <span id="stat-danjon" class="badge"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="visual-container">
+                        <h3>Visualisasi Posisi</h3>
+                        <img id="hilal-plot" src="" alt="Plot Hilal">
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <button onclick="copyToClipboard()" title="Copy Text"><i class="fas fa-copy"></i> Copy</button>
+                    <button onclick="downloadAs('txt')" title="Simpan sebagai TXT"><i class="fas fa-file-alt"></i> .txt</button>
+                    <button onclick="downloadAs('md')" title="Simpan sebagai MD"><i class="fas fa-file-code"></i> .md</button>
+                    <button onclick="downloadAs('csv')" title="Simpan sebagai CSV"><i class="fas fa-file-csv"></i> .csv</button>
+                    <button onclick="downloadAs('xlsx')" title="Simpan sebagai XLSX"><i class="fas fa-file-excel"></i> .xlsx</button>
+                    <button onclick="printResult()" title="Print"><i class="fas fa-print"></i> PRINT</button>
+                </div>
+            </section>
+        </section>
+
+        <section id="tab-recap" class="tab-content">
+            <section class="glass-card input-section">
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="recap-date"><i class="fas fa-calendar-alt"></i> Tanggal Pengamatan</label>
+                        <div class="date-wrapper">
+                            <input type="date" id="recap-date" value="2026-03-19">
+                            <span id="recap-day-name" class="day-badge">Kamis</span>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <button id="recap-btn" class="btn-primary">Lihat Rekap Nasional</button>
+                    </div>
+                </div>
+
+                <!-- History Panel for Recap -->
+                <div class="history-panel glass-card" id="history-recap">
+                    <div class="history-header">
+                        <h4><i class="fas fa-history"></i> Riwayat Rekap</h4>
+                        <button class="btn-text" onclick="clearHistory('recap')">Hapus Semua</button>
+                    </div>
+                    <div class="history-list" id="history-list-recap">
+                        <p class="empty-msg">Belum ada riwayat rekap.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="recap-result" class="recap-container hidden">
+                <div class="criteria-notes glass-card" style="margin-bottom: 2rem;">
+                    <h4><i class="fas fa-info-circle"></i> Keterangan Kriteria Visibilitas</h4>
+                    <div class="notes-grid">
+                        <div class="note-item">
+                            <strong>MABIMS (Baru):</strong>
+                            <span>Tinggi Hilal min. 3° DAN Elongasi min. 6.4°. Keduanya harus terpenuhi.</span>
+                        </div>
+                        <div class="note-item">
+                            <strong>Danjon Limit:</strong>
+                            <span>Hilal dianggap mustahil terlihat jika elongasi di bawah 7° (Limit fisik pantulan cahaya).</span>
+                        </div>
+                        <div class="note-item">
+                            <strong>Kriteria Odeh:</strong>
+                            <span>Berdasarkan ketebalan sabit dan kontras cahaya. A=Mudah, B=Mungkin, C/D=Butuh Optik, Invisible=Tidak Mungkin.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="toolbar recap-toolbar">
+                    <button id="export-recap-csv" class="btn-secondary"><i class="fas fa-file-csv"></i> Ekspor CSV</button>
+                    <button id="export-recap-xlsx" class="btn-secondary"><i class="fas fa-file-excel"></i> Ekspor Excel</button>
+                </div>
+                <div class="glass-card table-wrapper">
+                    <table class="recap-table" id="recap-table">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable(0)">Lokasi <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(1)">Sunset <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(2)">Altitude <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(3)">Elongasi <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(4)">MABIMS <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(5)">Odeh <i class="fas fa-sort"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody id="recap-body">
+                            <!-- Data will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </section>
+        </section>
+
+        <section id="tab-ai" class="tab-content">
+            <section class="glass-card chat-container" id="chat-wrapper">
+                <div class="chat-header" style="margin-bottom: 1.5rem; text-align: center; position: relative;">
+                    <h3><i class="fas fa-robot"></i> Konsultan Astronomi AI</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-dim);">Diskusikan data hilal Anda dengan AI.</p>
+                    <button id="toggle-fullscreen-btn" class="btn-secondary" style="position: absolute; right: 0; top: 0;" title="Full Screen" onclick="toggleChatFullscreen()"><i class="fas fa-expand"></i></button>
+                </div>
+
+                <div class="chat-settings" style="padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 10px; margin-bottom: 1.5rem;">
+                    <label style="font-size: 0.8rem; color: var(--accent-gold);">API Key Gemini:</label>
+                    <input type="password" id="gemini-key" placeholder="Masukkan API Key..." style="width: 100%; margin-top: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 0.5rem; color: white; border-radius: 5px;">
+                    <small style="display: block; margin-top: 0.3rem;"><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--accent-purple);">Ambil Key Baru Disini</a></small>
+                </div>
+
+                <div class="chat-messages" id="chat-messages" style="flex: 1;">
+                    <div class="message ai-message">
+                        Halo! Saya adalah Konsultan HI-Eye. Beritahu saya Nama Kota dan Tanggal, lalu tanya apa saja terkait hilal.
+                    </div>
+                </div>
+
+                <div class="chat-input-area">
+                    <textarea id="chat-input" placeholder="Tulis pertanyaan... (Enter untuk kirim)"></textarea>
+                    <button id="send-chat-btn" class="btn-primary"><i class="fas fa-paper-plane"></i></button>
+                </div>
+                
+                <div class="toolbar chat-toolbar" style="margin-top: 1rem; gap: 0.5rem;">
+                    <button onclick="copyChat()" title="Copy Text"><i class="fas fa-copy"></i> Copy</button>
+                    <button onclick="downloadChat('txt')" title="Simpan sebagai TXT"><i class="fas fa-file-alt"></i> .txt</button>
+                    <button onclick="downloadChat('md')" title="Simpan sebagai MD"><i class="fas fa-file-code"></i> .md</button>
+                    <button onclick="downloadChat('docx')" title="Simpan sebagai DOCX"><i class="fas fa-file-word"></i> .docx</button>
+                    <button onclick="printChat()" title="Print Chat"><i class="fas fa-print"></i> PRINT</button>
+                </div>
+            </section>
+        </section>
+
+        <div id="loader" class="loader hidden">
+            <div class="moon-loader"></div>
+            <p id="loader-text">Menghitung parameter astronomis...</p>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="cities.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
