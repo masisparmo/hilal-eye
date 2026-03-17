@@ -599,10 +599,13 @@ header p {
 .chat-container {
     display: flex;
     flex-direction: column;
-    height: 500px;
+    min-height: 500px;
+    height: 70vh; /* Responsive flexible height */
+    max-height: 800px;
     margin-top: 1rem;
     padding: 0 !important;
     overflow: hidden;
+    resize: vertical; /* Allow user to drag and resize vertically */
 }
 
 .chat-messages {
@@ -615,11 +618,12 @@ header p {
 }
 
 .message {
-    max-width: 80%;
+    max-width: 95%; /* Widened from 80% */
+    width: fit-content;
     padding: 1rem;
     border-radius: 15px;
     font-size: 0.95rem;
-    line-height: 1.5;
+    line-height: 1.6; /* Better readability */
 }
 
 .ai-message {
