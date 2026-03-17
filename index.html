@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -22,6 +22,37 @@
     --grad-primary: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
     --success-green: #22c55e;
     --danger-red: #ef4444;
+}
+
+[data-theme="light"] {
+    --bg-dark: #f0f4f8;
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --accent-gold: #d97706; /* Darker gold/amber for readability */
+    --accent-purple: #7e22ce; /* Darker purple */
+    --text-light: #0f172a; /* Main text is dark now */
+    --text-dim: #475569;
+    --grad-primary: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+}
+
+[data-theme="light"] .stars, [data-theme="light"] .twinkling {
+    display: none !important;
+}
+
+[data-theme="light"] select, [data-theme="light"] input[type="text"], [data-theme="light"] input[type="date"], [data-theme="light"] textarea {
+    background: #ffffff;
+    color: #0f172a;
+    border: 1px solid var(--glass-border);
+}
+
+[data-theme="light"] .criteria-notes {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--glass-border);
+}
+
+[data-theme="light"] .note-item {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 * {
@@ -112,6 +143,30 @@ header h1 {
 header p {
     color: var(--text-dim);
     letter-spacing: 1px;
+}
+
+.theme-toggle-btn {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--accent-gold);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.theme-toggle-btn:hover {
+    transform: rotate(15deg) scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
 }
 
 /* History Panel Styles */
@@ -727,6 +782,9 @@ header p {
     <div class="twinkling"></div>
     
     <main class="container">
+        <button class="theme-toggle-btn" id="theme-btn" title="Ganti Tema" onclick="toggleTheme()">
+            <i class="fas fa-sun" id="theme-icon"></i>
+        </button>
         <header>
             <h1><i class="fas fa-moon"></i> Hilal-Eye</h1>
             <p>Sistem Pemantauan Hilal Astronomis Terakurat</p>
@@ -1020,14 +1078,41 @@ async function idbDelete(key) {
     try {
         const db = await idbPromise;
         return new Promise((res, rej) => {
-            const req = db.transaction('keyval', 'readwrite').objectStore('keyval').delete(key);
+            const tx = db.transaction('keyval', 'readwrite');
+            const req = tx.objectStore('keyval').delete(key);
             req.onsuccess = () => res();
-            req.onerror = () => rej(req.error);
+            req.onerror = e => rej(e.target.error);
         });
-    } catch(e) {}
+    } catch (e) { console.error('IDB error:', e); }
+}
+
+// --- Theme Toggle Setup ---
+function toggleTheme() {
+    const html = document.documentElement;
+    const icon = document.getElementById('theme-icon');
+    
+    if (html.getAttribute('data-theme') === 'light') {
+        html.removeAttribute('data-theme');
+        icon.className = 'fas fa-sun';
+        localStorage.setItem('hilal_theme', 'dark');
+    } else {
+        html.setAttribute('data-theme', 'light');
+        icon.className = 'fas fa-moon';
+        localStorage.setItem('hilal_theme', 'light');
+    }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Load Theme Preferences
+    const savedTheme = localStorage.getItem('hilal_theme');
+    const html = document.documentElement;
+    const icon = document.getElementById('theme-icon');
+    
+    if (savedTheme === 'light') {
+        html.setAttribute('data-theme', 'light');
+        if (icon) icon.className = 'fas fa-moon';
+    }
+
     refreshHistoryList('single');
     refreshHistoryList('recap');
     const savedKey = await idbGet('gemini_api_key');
