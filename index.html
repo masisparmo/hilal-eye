@@ -1219,16 +1219,12 @@ function calculateHilalJS(cityName, dateIsoStr) {
     const moonTimes = SunCalc.getMoonTimes(d, lat, lon);
     const moonset = moonTimes.set;
     
-    // Angular Elongation
-    const dAz = (moonPos.azimuth - sunPos.azimuth);
-    const elongasiRad = Math.acos( Math.sin(sunPos.altitude)*Math.sin(moonPos.altitude) + Math.cos(sunPos.altitude)*Math.cos(moonPos.altitude)*Math.cos(dAz) );
-    const elongasi = elongasiRad * 180 / Math.PI;
-    
-    const lagTime = (moonset && moonset > sunset) ? (moonset - sunset) / 60000 : 0;
-    
-    const illum = SunCalc.getMoonIllumination(d);
-    // Approximate moon age in hours since last New Moon using phase (0 to 1 = 29.53 days)
+    // Moon Age (approximate hours since last conjunction)
+    // We use the moon's phase at sunset for a more accurate calculation than noon
+    const illum = SunCalc.getMoonIllumination(sunset);
     const moonAgeHours = (illum.phase * 29.530589 * 24);
+    
+    // Angular Elongation
     
     let mabims = "Tidak Memenuhi";
     if (moonAlt >= 3.0 && elongasi >= 6.4) mabims = "Ya (Terpenuhi)";
@@ -1350,12 +1346,14 @@ function drawHilalVisualization(data) {
     svg.appendChild(horizon);
     
     // MABIMS Limits
+    const sunAltActual = parseFloat(data["Altitude Matahari"]);
+    const sunYActual = getY(sunAltActual);
     const mabimsAltY = getY(3.0);
     const mabimsElongR = scale * 6.4;
 
-    // MABIMS Elongation 6.4 Arc
+    // MABIMS Elongation 6.4 Arc - Centered at actual Sun position
     const elongArc = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    elongArc.setAttribute("cx", width / 2); elongArc.setAttribute("cy", horizonY);
+    elongArc.setAttribute("cx", width / 2); elongArc.setAttribute("cy", sunYActual);
     elongArc.setAttribute("r", mabimsElongR);
     elongArc.setAttribute("stroke", "rgba(255, 100, 100, 0.5)");
     elongArc.setAttribute("stroke-width", "2");
@@ -1397,7 +1395,7 @@ function drawHilalVisualization(data) {
 
     // Sun Marker
     const sunMarker = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    sunMarker.setAttribute("cx", width / 2); sunMarker.setAttribute("cy", horizonY);
+    sunMarker.setAttribute("cx", width / 2); sunMarker.setAttribute("cy", sunYActual);
     sunMarker.setAttribute("r", "15"); sunMarker.setAttribute("fill", "url(#sunGradient)");
     
     const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
@@ -1408,7 +1406,7 @@ function drawHilalVisualization(data) {
 
     // Sun Label
     const sunText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    sunText.setAttribute("x", width / 2); sunText.setAttribute("y", horizonY + 40);
+    sunText.setAttribute("x", width / 2); sunText.setAttribute("y", sunYActual + 35);
     sunText.setAttribute("fill", "#ffaa00"); sunText.setAttribute("text-anchor", "middle");
     sunText.setAttribute("font-size", "12px"); sunText.setAttribute("font-weight", "bold");
     sunText.textContent = "MATAHARI";
@@ -1450,7 +1448,7 @@ function drawHilalVisualization(data) {
 
     // Draw Elongation connection line
     const elonLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    elonLine.setAttribute("x1", width / 2); elonLine.setAttribute("y1", horizonY);
+    elonLine.setAttribute("x1", width / 2); elonLine.setAttribute("y1", sunYActual);
     elonLine.setAttribute("x2", moonX); elonLine.setAttribute("y2", moonY);
     elonLine.setAttribute("stroke", "rgba(255, 204, 51, 0.4)");
     elonLine.setAttribute("stroke-width", "2");
