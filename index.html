@@ -616,28 +616,32 @@ header p {
     margin-top: 1rem;
     padding: 0 !important;
     overflow: hidden;
-    resize: vertical;
     position: relative;
 }
 
-/* Visual resize handle hint */
-.chat-container::after {
-    content: '⠿ Tarik untuk mengubah ukuran';
+/* Drag resize handle */
+.chat-resize-handle {
+    height: 10px;
+    background: rgba(168, 85, 247, 0.1);
+    border-top: 1px solid rgba(168, 85, 247, 0.25);
+    border-bottom: 1px solid rgba(168, 85, 247, 0.25);
+    cursor: ns-resize;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 24px;
-    background: rgba(168, 85, 247, 0.15);
-    color: rgba(255,255,255,0.35);
-    font-size: 0.7rem;
-    letter-spacing: 1px;
-    cursor: ns-resize;
     user-select: none;
-    border-top: 1px solid rgba(168, 85, 247, 0.2);
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+.chat-resize-handle:hover, .chat-resize-handle.dragging {
+    background: rgba(168, 85, 247, 0.3);
+}
+.chat-resize-handle::after {
+    content: '';
+    width: 40px;
+    height: 3px;
+    background: rgba(168, 85, 247, 0.5);
+    border-radius: 3px;
 }
 
 .chat-messages {
@@ -1031,11 +1035,14 @@ header p {
                     <small style="display: block; margin-top: 0.3rem;"><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--accent-purple);">Ambil Key Baru Disini</a></small>
                 </div>
 
-                <div class="chat-messages" id="chat-messages" style="flex: 1;">
+                <div class="chat-messages" id="chat-messages">
                     <div class="message ai-message">
                         Halo! Saya adalah Konsultan HI-Eye. Beritahu saya Nama Kota dan Tanggal, lalu tanya apa saja terkait hilal.
                     </div>
                 </div>
+
+                <!-- Drag to resize handle -->
+                <div class="chat-resize-handle" id="chat-resize-handle" title="Tarik atas/bawah untuk mengubah tinggi"></div>
 
                 <div class="chat-input-area">
                     <textarea id="chat-input" placeholder="Tulis pertanyaan... (Enter untuk kirim)"></textarea>
@@ -1846,6 +1853,60 @@ function hideLoader() {
     const loader = document.getElementById('loader');
     if (loader) loader.classList.add('hidden');
 }
+
+// --- Chat Resize Handle (Drag to resize messages area) ---
+(function() {
+    function initChatResize() {
+        const handle = document.getElementById('chat-resize-handle');
+        const messages = document.getElementById('chat-messages');
+        if (!handle || !messages) return;
+
+        // Set initial height on messages so it's explicit
+        messages.style.height = messages.offsetHeight + 'px';
+        messages.style.flex = 'none';
+
+        let startY = 0, startH = 0;
+
+        function onMove(clientY) {
+            const delta = clientY - startY;
+            const newH = Math.max(150, Math.min(window.innerHeight * 0.8, startH + delta));
+            messages.style.height = newH + 'px';
+        }
+
+        handle.addEventListener('mousedown', (e) => {
+            startY = e.clientY;
+            startH = messages.offsetHeight;
+            handle.classList.add('dragging');
+            document.body.style.cursor = 'ns-resize';
+            document.body.style.userSelect = 'none';
+
+            const onMouseMove = (e) => onMove(e.clientY);
+            const onMouseUp = () => {
+                handle.classList.remove('dragging');
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            };
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+            e.preventDefault();
+        });
+
+        // Touch support
+        handle.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+            startH = messages.offsetHeight;
+            handle.classList.add('dragging');
+        }, { passive: true });
+        handle.addEventListener('touchmove', (e) => {
+            onMove(e.touches[0].clientY);
+        }, { passive: true });
+        handle.addEventListener('touchend', () => handle.classList.remove('dragging'));
+    }
+
+    document.addEventListener('DOMContentLoaded', initChatResize);
+})();
 
 </script>
 </body>
