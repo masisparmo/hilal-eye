@@ -1150,6 +1150,123 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load Gemini API key from localStorage
     const savedKey = localStorage.getItem('gemini_api_key');
     if (savedKey) document.getElementById('gemini-key').value = savedKey;
+    // Auto-save Gemini API key on input
+    document.getElementById('gemini-key').addEventListener('input', (e) => {
+        localStorage.setItem('gemini_api_key', e.target.value);
+    });
+
+    // Populate City Datalist
+    const cityListEl = document.getElementById('city-list');
+    if (typeof CITIES !== 'undefined' && cityListEl) {
+        CITIES.forEach(city => {
+            const opt = document.createElement('option');
+            opt.value = city.name;
+            cityListEl.appendChild(opt);
+        });
+    }
+
+    // Setup Flatpickr date pickers
+    const config = {
+        dateFormat: "d/m/Y",
+        allowInput: true,
+        disableMobile: true,
+        onChange: function(selectedDates, dateStr, instance) {
+            const inputId = instance.element.id;
+            const labelId = inputId === 'obs-date' ? 'obs-day-name' : 'recap-day-name';
+            if (selectedDates.length > 0) {
+                document.getElementById(labelId).textContent = INDO_DAYS[selectedDates[0].getDay()];
+            }
+        }
+    };
+    obsPicker = flatpickr("#obs-date", { ...config, defaultDate: "19/03/2026" });
+    recapPicker = flatpickr("#recap-date", { ...config, defaultDate: "19/03/2026" });
+    updateDayLabelManual('obs-date', 'obs-day-name');
+    updateDayLabelManual('recap-date', 'recap-day-name');
+
+    // Load history on startup
+    refreshHistoryList('single');
+    refreshHistoryList('recap');
+});
+
+// --- History UI (localStorage-based) ---
+function refreshHistoryList(type) {
+    const list = document.getElementById(`history-list-${type}`);
+    if (!list) return;
+    const key = type === 'single' ? HIST_SINGLE_KEY : HIST_RECAP_KEY;
+    let history = [];
+    try { history = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+    list.innerHTML = '';
+    if (history.length === 0) {
+        list.innerHTML = `<p class="empty-msg">Belum ada riwayat ${type === 'single' ? '' : 'rekap'}.</p>`;
+        return;
+    }
+    history.slice().reverse().forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        const realIdx = history.length - 1 - idx;
+        div.onclick = () => restoreFromHistory(type, realIdx);
+        div.innerHTML = `<div class="info"><span class="name">${type === 'single' ? item.Lokasi : 'Rekap Nasional'}</span><span class="date">${item.Tanggal || (item.data && item.data[0] ? item.data[0].Tanggal : 'Data Rekap')}</span></div><i class="fas fa-chevron-right"></i>`;
+        list.appendChild(div);
+    });
+}
+
+function saveToHistory(type, data) {
+    const key = type === 'single' ? HIST_SINGLE_KEY : HIST_RECAP_KEY;
+    try {
+        let history = JSON.parse(localStorage.getItem(key) || '[]');
+        const isDup = history.some(item => (type === 'single' && item.Lokasi === data.Lokasi && item.Tanggal === data.Tanggal) || (type === 'recap' && item.Tanggal === data.Tanggal));
+        if (isDup) return;
+        history.push(data);
+        if (history.length > 20) history.shift();
+        localStorage.setItem(key, JSON.stringify(history));
+    } catch(e) { console.warn('localStorage error:', e); }
+    refreshHistoryList(type);
+}
+
+function clearHistory(type) {
+    if (confirm(`Hapus semua riwayat ${type === 'single' ? 'perhitungan' : 'rekap'}?`)) {
+        try { localStorage.removeItem(type === 'single' ? HIST_SINGLE_KEY : HIST_RECAP_KEY); } catch(e) {}
+        refreshHistoryList(type);
+    }
+}
+
+function restoreFromHistory(type, index) {
+    let history = [];
+    try { history = JSON.parse(localStorage.getItem(type === 'single' ? HIST_SINGLE_KEY : HIST_RECAP_KEY) || '[]'); } catch(e) {}
+    const data = history[index];
+    if (!data) return;
+    if (type === 'single') {
+        currentFullResult = data;
+        renderResult(data);
+        document.getElementById('city-input').value = data.Lokasi;
+    } else {
+        currentRecapData = data.data;
+        renderRecapTable(data.data);
+    }
+}
+
+// Single City Calculation - case-insensitive
+document.getElementById('calculate-btn').addEventListener('click', () => {
+    const rawCity = document.getElementById('city-input').value.trim();
+    const matchedCity = (typeof CITIES !== 'undefined')
+        ? (CITIES.find(c => c.name.toLowerCase() === rawCity.toLowerCase()) || null)
+        : null;
+    const city = matchedCity ? matchedCity.name : rawCity;
+    const date = getISODate(obsPicker);
+    if (!rawCity || !date) { alert('Mohon pilih kota dan tanggal terlebih dahulu.'); return; }
+    if (!matchedCity) { alert('Kota tidak ditemukan di database.'); return; }
+
+    showLoader('Menghitung parameter astronomis...');
+    document.getElementById('result-section').classList.add('hidden');
+
+    setTimeout(() => {
+        const data = calculateHilalJS(city, date);
+        hideLoader();
+        if (data.error) { alert(data.error); return; }
+        currentFullResult = data;
+        renderResult(data);
+        saveToHistory('single', data);
+    }, 300);
 });
 
 function updateDayLabelManual(inputId, labelId) {
