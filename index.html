@@ -708,6 +708,56 @@ header p {
     margin-bottom: 1rem;
 }
 
+/* Rich Text inside chat (AI message typography) */
+.ai-message p { margin: 0.6rem 0; line-height: 1.7; }
+.ai-message p:first-child { margin-top: 0; }
+.ai-message p:last-child { margin-bottom: 0; }
+.ai-message h1, .ai-message h2, .ai-message h3, .ai-message h4 {
+    margin: 1rem 0 0.4rem 0;
+    color: var(--accent-gold);
+    font-weight: 600;
+}
+.ai-message h1:first-child, .ai-message h2:first-child, .ai-message h3:first-child { margin-top: 0; }
+.ai-message ul, .ai-message ol {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+.ai-message li {
+    margin-bottom: 0.4rem;
+    line-height: 1.6;
+}
+.ai-message li:last-child { margin-bottom: 0; }
+.ai-message strong { color: #fff; }
+.ai-message em { color: var(--accent-gold); font-style: italic; }
+.ai-message code {
+    background: rgba(255,255,255,0.1);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+.ai-message pre {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 0.8rem 0;
+}
+.ai-message pre code { background: none; padding: 0; }
+.ai-message hr {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin: 1rem 0;
+}
+.ai-message blockquote {
+    border-left: 3px solid var(--accent-purple);
+    padding-left: 1rem;
+    margin: 0.8rem 0;
+    color: rgba(255,255,255,0.75);
+    font-style: italic;
+}
+
 /* Rich Text inside chat */
 .message table {
     width: 100%;
