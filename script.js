@@ -65,7 +65,7 @@ function switchTab(tabId, element) {
 
 // --- ASTRONOMY LOGIC (Replace Flask/Skyfield) ---
 function calculateHilalJS(cityName, dateIsoStr) {
-    const city = typeof CITIES !== 'undefined' ? CITIES.find(c => c.name === cityName) : null;
+    const city = typeof CITIES !== 'undefined' ? CITIES.find(c => c.name.toLowerCase() === cityName.toLowerCase()) : null;
     if (!city) return { error: "Kota tidak ditemukan di database." };
 
     const lat = city.lat;
@@ -101,6 +101,10 @@ function calculateHilalJS(cityName, dateIsoStr) {
     
     const lagTime = (moonset && moonset > sunset) ? (moonset - sunset) / 60000 : 0;
     
+    // Moon Age at sunset
+    const illum = SunCalc.getMoonIllumination(sunset);
+    const moonAgeHours = (illum.phase * 29.530589 * 24);
+    
     let mabims = "Tidak Memenuhi";
     if (moonAlt >= 3.0 && elongasi >= 6.4) mabims = "Ya (Terpenuhi)";
     
@@ -125,7 +129,7 @@ function calculateHilalJS(cityName, dateIsoStr) {
         "Azimuth Bulan": moonAz.toFixed(3),
         "Altitude Hilal": moonAlt.toFixed(3),
         "Elongasi": elongasi.toFixed(3),
-        "Umur Bulan (Jam)": "N/A",
+        "Umur Bulan (Jam)": moonAgeHours.toFixed(1),
         "Lag Time (Menit)": lagTime.toFixed(1),
         "MABIMS": mabims,
         "Odeh": odeh,
