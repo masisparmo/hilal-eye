@@ -1225,6 +1225,11 @@ function calculateHilalJS(cityName, dateIsoStr) {
     const moonAgeHours = (illum.phase * 29.530589 * 24);
     
     // Angular Elongation
+    const dAz = (moonPos.azimuth - sunPos.azimuth);
+    const elongasiRad = Math.acos( Math.sin(sunPos.altitude)*Math.sin(moonPos.altitude) + Math.cos(sunPos.altitude)*Math.cos(moonPos.altitude)*Math.cos(dAz) );
+    const elongasi = elongasiRad * 180 / Math.PI;
+    
+    const lagTime = (moonset && moonset > sunset) ? (moonset - sunset) / 60000 : 0;
     
     let mabims = "Tidak Memenuhi";
     if (moonAlt >= 3.0 && elongasi >= 6.4) mabims = "Ya (Terpenuhi)";
