@@ -1190,7 +1190,7 @@ function switchTab(tabId, element) {
 
 // --- ASTRONOMY LOGIC (Replace Flask/Skyfield) ---
 function calculateHilalJS(cityName, dateIsoStr) {
-    const city = typeof CITIES !== 'undefined' ? CITIES.find(c => c.name === cityName) : null;
+    const city = typeof CITIES !== 'undefined' ? CITIES.find(c => c.name.toLowerCase() === cityName.toLowerCase()) : null;
     if (!city) return { error: "Kota tidak ditemukan di database." };
 
     const lat = city.lat;
