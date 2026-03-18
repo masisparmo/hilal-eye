@@ -301,9 +301,15 @@ function restoreFromHistory(type, index) {
 
 // Single City Calculation
 document.getElementById('calculate-btn').addEventListener('click', () => {
-    const city = document.getElementById('city-input').value;
+    const rawCity = document.getElementById('city-input').value.trim();
+    // Resolve city name case-insensitively
+    const matchedCity = (typeof CITIES !== 'undefined')
+        ? (CITIES.find(c => c.name.toLowerCase() === rawCity.toLowerCase()) || null)
+        : null;
+    const city = matchedCity ? matchedCity.name : rawCity;
     const date = getISODate(obsPicker);
-    if (!city || !date) { alert('Mohon pilih kota dan tanggal terlebih dahulu.'); return; }
+    if (!rawCity || !date) { alert('Mohon pilih kota dan tanggal terlebih dahulu.'); return; }
+    if (!matchedCity) { alert('Kota tidak ditemukan di database.'); return; }
     
     showLoader('Menghitung parameter astronomis...');
     document.getElementById('result-section').classList.add('hidden');
@@ -473,6 +479,10 @@ async function downloadAs(format) {
 let chatHistory = [];
 document.getElementById('send-chat-btn').addEventListener('click', () => sendChatMessage());
 document.getElementById('chat-input').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); } });
+// Auto-save Gemini API key
+document.getElementById('gemini-key').addEventListener('input', (e) => {
+    localStorage.setItem('gemini_api_key', e.target.value);
+});
 
 async function sendChatMessage() {
     const input = document.getElementById('chat-input');

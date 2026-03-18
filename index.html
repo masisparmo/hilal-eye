@@ -1117,53 +1117,18 @@ function toggleTheme() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     // Load Theme Preferences
     const savedTheme = localStorage.getItem('hilal_theme');
     const html = document.documentElement;
     const icon = document.getElementById('theme-icon');
-    
     if (savedTheme === 'light') {
         html.setAttribute('data-theme', 'light');
         if (icon) icon.className = 'fas fa-moon';
     }
-
-    refreshHistoryList('single');
-    refreshHistoryList('recap');
-    const savedKey = await idbGet('gemini_api_key');
+    // Load Gemini API key from localStorage
+    const savedKey = localStorage.getItem('gemini_api_key');
     if (savedKey) document.getElementById('gemini-key').value = savedKey;
-
-    // Populate City List
-    const cityListId = document.getElementById('city-list');
-    if (typeof CITIES !== 'undefined') {
-        CITIES.forEach(city => {
-            const opt = document.createElement('option');
-            opt.value = city.name;
-            cityListId.appendChild(opt);
-        });
-    }
-
-    const config = {
-        dateFormat: "d/m/Y",
-        allowInput: true,
-        disableMobile: true,
-        onChange: function(selectedDates, dateStr, instance) {
-            const inputId = instance.element.id;
-            const labelId = inputId === 'obs-date' ? 'obs-day-name' : 'recap-day-name';
-            if (selectedDates.length > 0) {
-                document.getElementById(labelId).textContent = INDO_DAYS[selectedDates[0].getDay()];
-            }
-        }
-    };
-
-    obsPicker = flatpickr("#obs-date", { ...config, defaultDate: "19/03/2026" });
-    recapPicker = flatpickr("#recap-date", { ...config, defaultDate: "19/03/2026" });
-    
-    updateDayLabelManual('obs-date', 'obs-day-name');
-    updateDayLabelManual('recap-date', 'recap-day-name');
-
-    refreshHistoryList('single');
-    refreshHistoryList('recap');
 });
 
 function updateDayLabelManual(inputId, labelId) {
@@ -1463,81 +1428,7 @@ function drawHilalVisualization(data) {
     container.appendChild(svg);
 }
 
-// --- History UI ---
-async function refreshHistoryList(type) {
-    const list = document.getElementById(`history-list-${type}`);
-    const key = type === 'single' ? HIST_SINGLE_KEY : HIST_RECAP_KEY;
-    let history = await idbGet(key) || [];
-    
-    list.innerHTML = '';
-    if (history.length === 0) {
-        list.innerHTML = `<p class="empty-msg">Belum ada riwayat ${type === 'single' ? '' : 'recap'}.</p>`;
-        return;
-    }
-    history.slice().reverse().forEach((item, idx) => {
-        const div = document.createElement('div');
-        div.className = 'history-item';
-        const realIdx = history.length - 1 - idx;
-        div.onclick = () => restoreFromHistory(type, realIdx);
-        div.innerHTML = `<div class="info"><span class="name">${type === 'single' ? item.Lokasi : 'Rekap Nasional'}</span><span class="date">${item.Tanggal || (item.data && item.data[0] ? item.data[0].Tanggal : 'Data Rekap')}</span></div><i class="fas fa-chevron-right"></i>`;
-        list.appendChild(div);
-    });
-}
 
-async function saveToHistory(type, data) {
-    const key = type === 'single' ? HIST_SINGLE_KEY : HIST_RECAP_KEY;
-    let history = await idbGet(key) || [];
-    const isDup = history.some(item => (type === 'single' && item.Lokasi === data.Lokasi && item.Tanggal === data.Tanggal) || (type === 'recap' && item.Tanggal === data.Tanggal));
-    if (isDup) return;
-    history.push(data);
-    if (history.length > 20) history.shift();
-    await idbSet(key, history);
-    refreshHistoryList(type);
-}
-
-async function clearHistory(type) {
-    if (confirm(`Hapus semua riwayat ${type === 'single' ? 'perhitungan' : 'rekap'}?`)) {
-        await idbDelete(type === 'single' ? HIST_SINGLE_KEY : HIST_RECAP_KEY);
-        refreshHistoryList(type);
-    }
-}
-
-async function restoreFromHistory(type, index) {
-    const key = type === 'single' ? HIST_SINGLE_KEY : HIST_RECAP_KEY;
-    let history = await idbGet(key) || [];
-    const data = history[index];
-    if (type === 'single') {
-        currentFullResult = data;
-        renderResult(data);
-        document.getElementById('city-input').value = data.Lokasi;
-    } else {
-        currentRecapData = data.data;
-        renderRecapTable(data.data);
-    }
-}
-
-// Single City Calculation
-document.getElementById('calculate-btn').addEventListener('click', () => {
-    const rawCity = document.getElementById('city-input').value.trim();
-    // Resolve the exact city name (case-insensitive) from the CITIES database
-    const matchedCity = (typeof CITIES !== 'undefined')
-        ? (CITIES.find(c => c.name.toLowerCase() === rawCity.toLowerCase()) || null)
-        : null;
-    const city = matchedCity ? matchedCity.name : rawCity;
-    const date = getISODate(obsPicker);
-    if (!rawCity || !date) { alert('Mohon pilih kota dan tanggal terlebih dahulu.'); return; }
-    if (!matchedCity) { alert('Kota tidak ditemukan di database.'); return; }
-    
-    showLoader('Menghitung parameter astronomis...');
-    document.getElementById('result-section').classList.add('hidden');
-    
-    setTimeout(() => {
-        const data = calculateHilalJS(city, date);
-        hideLoader();
-        if (data.error) { alert(data.error); return; }
-        currentFullResult = data;
-        renderResult(data);
-        saveToHistory('single', data);
     }, 300);
 });
 
