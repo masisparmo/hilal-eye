@@ -1518,9 +1518,15 @@ async function restoreFromHistory(type, index) {
 
 // Single City Calculation
 document.getElementById('calculate-btn').addEventListener('click', () => {
-    const city = document.getElementById('city-input').value;
+    const rawCity = document.getElementById('city-input').value.trim();
+    // Resolve the exact city name (case-insensitive) from the CITIES database
+    const matchedCity = (typeof CITIES !== 'undefined')
+        ? (CITIES.find(c => c.name.toLowerCase() === rawCity.toLowerCase()) || null)
+        : null;
+    const city = matchedCity ? matchedCity.name : rawCity;
     const date = getISODate(obsPicker);
-    if (!city || !date) { alert('Mohon pilih kota dan tanggal terlebih dahulu.'); return; }
+    if (!rawCity || !date) { alert('Mohon pilih kota dan tanggal terlebih dahulu.'); return; }
+    if (!matchedCity) { alert('Kota tidak ditemukan di database.'); return; }
     
     showLoader('Menghitung parameter astronomis...');
     document.getElementById('result-section').classList.add('hidden');
