@@ -1753,11 +1753,11 @@ async function sendChatMessage() {
         currentRecapData.slice(0, 10).forEach((item, index) => { contextPayload["Data Rekap Nasional"]["Daftar Kota"].push(`${item.Lokasi} | Alt: ${item.Altitude}° | Elong: ${item.Elongasi}° | MABIMS: ${item.MABIMS}`); });
     }
     
-    // If no context currently generated in the session, pull from history
+    // If no context currently generated in the session, pull from history (localStorage)
     if (Object.keys(contextPayload).length === 0) {
         try {
-            const histSingle = await idbGet(HIST_SINGLE_KEY) || [];
-            const histRecap = await idbGet(HIST_RECAP_KEY) || [];
+            const histSingle = JSON.parse(localStorage.getItem(HIST_SINGLE_KEY) || '[]');
+            const histRecap = JSON.parse(localStorage.getItem(HIST_RECAP_KEY) || '[]');
             if (histSingle.length > 0) Object.assign(contextPayload, { "Data Kalkulator Kota (Riwayat)": histSingle[histSingle.length - 1] });
             if (histRecap.length > 0) {
                const latestRecapObj = histRecap[histRecap.length - 1];
@@ -1772,7 +1772,24 @@ async function sendChatMessage() {
         ctxText = "DATA PERHITUNGAN TERBARU (PENTING: GUNAKAN INI SEBAGAI SUMBER UTAMA):\n" + JSON.stringify(contextPayload, null, 2);
     }
 
-    const systemPrompt = "Anda adalah Konsultan Astronomi Hilal-Eye. Tugas utama Anda adalah menyimpulkan kapan awal bulan Hijriah (misalnya 1 Syawal/Lebaran atau 1 Ramadhan) berdasarkan 'DATA PERHITUNGAN TERBARU' yang diberikan. Perhatikan kedua jenis data (Kalkulator Kota & Rekap Nasional) jika tersedia, dan tarik kesimpulan general.\nATURAN DEDUKSI KALENDER:\n1. Perhatikan 'Tanggal Observasi' yang ada di data (Ini biasanya adalah tanggal 29 bulan Hijriah).\n2. Jika kriteria MABIMS 'Tidak Memenuhi', bulan berjalan digenapkan 30 hari (istikmal), dan bulan baru (misal Lebaran) akan jatuh PADA LUSA dari tanggal observasi.\n3. Jika kriteria MABIMS 'Ya', bulan baru jatuh PADA KEESOKAN HARINYA.\nJawablah santai namun profesional dan presisi. GUNAKAN FORMAT MARKDOWN.";
+    const systemPrompt = `Anda adalah Asisten AI Hilal-Eye, asisten yang cerdas dan berpengetahuan luas.
+
+PERAN UTAMA (jika ada data perhitungan hilal):
+- Analisis 'DATA PERHITUNGAN TERBARU' yang diberikan
+- Simpulkan kapan awal bulan Hijriah berdasarkan kriteria MABIMS
+- Jika MABIMS 'Ya': bulan baru = keesokan harinya dari tanggal observasi
+- Jika MABIMS 'Tidak': bulan baru = lusa dari tanggal observasi (istikmal)
+
+PERAN UMUM (jika tidak ada data hilal atau pertanyaan umum):
+- Jawab pertanyaan umum tentang astronomi, kalender Hijriah, hadits terkait hilal, fiqh rukyat, dll.
+- Jawab pertanyaan umum apapun yang ditanyakan user dengan baik dan informatif
+- Anda boleh menjawab pertanyaan di luar topik hilal jika user bertanya
+
+GAYA JAWABAN:
+- Gunakan Bahasa Indonesia yang santai namun profesional
+- Gunakan FORMAT MARKDOWN (bold, bullet points, dll)
+- Berikan jawaban yang lengkap dan akurat
+- Jika ada DATA PERHITUNGAN, selalu rujuk data tersebut sebagai sumber utama`;
 
     const loadingId = 'ai-loading-' + Date.now();
     const loadingDiv = document.createElement('div');
