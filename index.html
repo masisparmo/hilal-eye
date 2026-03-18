@@ -610,13 +610,34 @@ header p {
 .chat-container {
     display: flex;
     flex-direction: column;
-    min-height: 500px;
-    height: 70vh; /* Responsive flexible height */
-    max-height: 800px;
+    min-height: 600px;
+    height: 75vh;
+    max-height: 90vh;
     margin-top: 1rem;
     padding: 0 !important;
     overflow: hidden;
-    resize: vertical; /* Allow user to drag and resize vertically */
+    resize: vertical;
+    position: relative;
+}
+
+/* Visual resize handle hint */
+.chat-container::after {
+    content: '⠿ Tarik untuk mengubah ukuran';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 24px;
+    background: rgba(168, 85, 247, 0.15);
+    color: rgba(255,255,255,0.35);
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    cursor: ns-resize;
+    user-select: none;
+    border-top: 1px solid rgba(168, 85, 247, 0.2);
 }
 
 .chat-messages {
