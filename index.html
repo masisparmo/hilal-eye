@@ -335,7 +335,7 @@ header p {
     border: 1px solid var(--glass-border);
     border-radius: 10px;
     padding: 0.8rem;
-    color: white;
+    color: var(--text-light);
     font-family: inherit;
     outline: none;
     transition: border-color 0.3s;
@@ -359,7 +359,7 @@ header p {
     position: absolute;
     right: 10px;
     background: var(--accent-purple);
-    color: white;
+    color: #ffffff; /* Explicitly keep white on purple bg */
     padding: 0.2rem 0.6rem;
     border-radius: 6px;
     font-size: 0.75rem;
@@ -404,7 +404,7 @@ header p {
 
 .btn-secondary {
     background: rgba(255, 255, 255, 0.1);
-    color: white;
+    color: var(--text-light);
     border: 1px solid var(--glass-border);
     padding: 0.5rem 1rem;
     border-radius: 8px;
@@ -514,7 +514,7 @@ header p {
 .toolbar button {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
-    color: white;
+    color: var(--text-light);
     padding: 0.6rem 1.2rem;
     border-radius: 8px;
     cursor: pointer;
@@ -525,6 +525,12 @@ header p {
 .toolbar button:hover {
     background: rgba(255, 255, 255, 0.15);
     border-color: var(--accent-gold);
+    color: white;
+}
+
+[data-theme="light"] .toolbar button:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #000;
 }
 
 /* Recap Table Styles */
@@ -689,7 +695,7 @@ header p {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--glass-border);
     border-radius: 10px;
-    color: #fff;
+    color: var(--text-light);
     padding: 0.8rem;
     resize: none;
     outline: none;
@@ -1081,7 +1087,7 @@ header p {
 
                 <div class="chat-settings" style="padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 10px; margin-bottom: 1.5rem;">
                     <label style="font-size: 0.8rem; color: var(--accent-gold);">API Key Gemini:</label>
-                    <input type="password" id="gemini-key" placeholder="Masukkan API Key..." style="width: 100%; margin-top: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 0.5rem; color: white; border-radius: 5px;">
+                    <input type="password" id="gemini-key" placeholder="Masukkan API Key..." style="width: 100%; margin-top: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 0.5rem; color: var(--text-light); border-radius: 5px;">
                     <small style="display: block; margin-top: 0.3rem;"><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--accent-purple);">Ambil Key Baru Disini</a></small>
                 </div>
 
